@@ -39,7 +39,7 @@ const Signup = () => {
       [e.target.name]: e.target.value
     });
   };
-
+//implement handleSubmit function with validation
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
