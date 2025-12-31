@@ -55,6 +55,7 @@ const Signup = () => {
       await register(formData.name, formData.email, formData.password);
       navigate('/dashboard');
     } catch (error) {
+      //add detailed error handling for signup
       if (error.response?.data?.message === 'User already exists') {
         setError('Email already exists. Please use a different email.');
       } else if (error.response?.data?.errors) {
