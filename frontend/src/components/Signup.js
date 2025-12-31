@@ -18,6 +18,8 @@ import { PersonAdd, Email, Lock, Person } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
+
+  //add state management for signup form
   const [formData, setFormData] = useState({
     name: '',
     email: '',
