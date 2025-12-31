@@ -33,7 +33,7 @@ const Login = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
-
+// Added handleChange function for form inputs
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -41,6 +41,7 @@ const Login = () => {
     });
   };
 
+  // Added async submit handling for improved login flow
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
