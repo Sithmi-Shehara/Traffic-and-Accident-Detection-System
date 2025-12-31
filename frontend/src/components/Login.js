@@ -24,7 +24,11 @@ const Login = () => {
     email: '',
     password: ''
   });
+
+  // Added error handling state
+
   const [error, setError] = useState('');
+  // Loading state added for UX improvement
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
