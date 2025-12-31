@@ -32,6 +32,7 @@ const Signup = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  //implement handleChange for form inputs
   const handleChange = (e) => {
     setFormData({
       ...formData,
