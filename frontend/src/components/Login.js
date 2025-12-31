@@ -87,7 +87,7 @@ const Login = () => {
                 {error}
               </Alert>
             )}
-            // Form added
+             {/* Form added  */}
             <Box component="form" onSubmit={handleSubmit}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -142,6 +142,7 @@ const Login = () => {
                 </Grid>
               </Grid>
             </Box>
+            {/* Signup link added */}
 
             <Box sx={{ textAlign: 'center', mt: 3 }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
