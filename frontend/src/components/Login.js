@@ -87,7 +87,7 @@ const Login = () => {
                 {error}
               </Alert>
             )}
-
+            // Form added
             <Box component="form" onSubmit={handleSubmit}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
