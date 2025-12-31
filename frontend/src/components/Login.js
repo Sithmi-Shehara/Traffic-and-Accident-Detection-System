@@ -17,6 +17,8 @@ import {
 import { Login as LoginIcon, Email, Lock } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
+
+//Added initial state for form data
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
