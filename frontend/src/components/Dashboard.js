@@ -27,7 +27,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     logout();
   };
-
+//initial setup 
   const stats = [
     {
       title: 'Total Violations',
