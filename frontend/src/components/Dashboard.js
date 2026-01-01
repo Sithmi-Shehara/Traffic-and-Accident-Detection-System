@@ -70,6 +70,8 @@ const Dashboard = () => {
             flexWrap: 'wrap',
             gap: 2
           }}>
+             {/* Dashboard branding area */}
+            
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
                 <DashboardIcon />
