@@ -6,6 +6,8 @@ const auth = async (req, res, next) => {
     // Get token from Authorization header
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
+
+    // Deny access if token is missing
     if (!token) {
       return res.status(401).json({ message: 'No token, authorization denied' });
     }
