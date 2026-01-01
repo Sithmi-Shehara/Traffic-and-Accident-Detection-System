@@ -120,6 +120,8 @@ const Dashboard = () => {
               Monitor and manage traffic violations efficiently. Access real-time data, 
               track case progress, and ensure compliance with traffic regulations.
             </Typography>
+              {/* Highlighting key features for clarity */}
+
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <Chip label="Real-time Monitoring" color="primary" variant="outlined" />
               <Chip label="Case Management" color="secondary" variant="outlined" />
