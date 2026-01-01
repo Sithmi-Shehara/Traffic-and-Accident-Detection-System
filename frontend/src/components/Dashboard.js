@@ -23,7 +23,7 @@ import { useAuth } from '../context/AuthContext';
 //user details
 const Dashboard = () => {
   const { user, logout } = useAuth();
-
+ // Added a separate handler for logout
   const handleLogout = () => {
     logout();
   };
