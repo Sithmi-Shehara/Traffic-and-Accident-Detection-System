@@ -20,7 +20,7 @@ import {
   CheckCircle
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
-
+//user details
 const Dashboard = () => {
   const { user, logout } = useAuth();
 
