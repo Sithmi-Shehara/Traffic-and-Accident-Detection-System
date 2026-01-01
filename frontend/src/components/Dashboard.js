@@ -94,6 +94,7 @@ const Dashboard = () => {
                 variant="outlined"
                 sx={{ display: { xs: 'none', sm: 'flex' } }}
               />
+               {/* Logout action placed in header for quick access */}
               <Button
                 variant="contained"
                 color="error"
