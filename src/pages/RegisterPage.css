@@ -137,3 +137,15 @@
   text-decoration: underline;
 }
 
+.input-error {
+  border-color: #F44336 !important;
+}
+
+.error-message-field {
+  color: #F44336;
+  font-size: 14px;
+  font-family: 'Public Sans', sans-serif;
+  margin-top: 4px;
+  display: block;
+}
+
