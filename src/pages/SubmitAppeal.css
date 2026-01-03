@@ -250,3 +250,20 @@
   transform: scale(0.98);
 }
 
+.input-error {
+  border-color: #F44336 !important;
+}
+
+.upload-error {
+  border-color: #F44336 !important;
+  background-color: #ffebee;
+}
+
+.error-message-field {
+  color: #F44336;
+  font-size: 14px;
+  font-family: 'Public Sans', sans-serif;
+  margin-top: 4px;
+  display: block;
+}
+
