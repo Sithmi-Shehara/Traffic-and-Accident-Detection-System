@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
+import API_BASE_URL from '../config/api';
+import { saveToken } from '../utils/auth';
 import './LoginPage.css';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -15,13 +19,45 @@ const LoginPage = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setError(''); // Clear error when user types
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement login logic
-    console.log('Login:', formData);
-    navigate('/dashboard');
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Save token to localStorage
+        saveToken(data.data.token);
+        
+        // Redirect based on user role
+        const userRole = data.data.user?.role;
+        if (userRole === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        setError(data.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Network error. Please check if backend is running.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,18 +76,30 @@ const LoginPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
+            {error && (
+              <div className="error-message" style={{ 
+                color: 'red', 
+                padding: '10px', 
+                marginBottom: '15px',
+                backgroundColor: '#ffe6e6',
+                borderRadius: '5px'
+              }}>
+                {error}
+              </div>
+            )}
+
             <div className="form-group">
-              <label htmlFor="username" className="form-label">
-                Username
+              <label htmlFor="email" className="form-label">
+                Email
               </label>
               <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="Enter your username"
+                placeholder="Enter your email"
                 required
               />
             </div>
@@ -76,8 +124,12 @@ const LoginPage = () => {
               <Link to="/forgot-password">Forgot password?</Link>
             </div>
 
-            <button type="submit" className="submit-button">
-              Login
+            <button 
+              type="submit" 
+              className="submit-button"
+              disabled={loading}
+            >
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
         </div>
