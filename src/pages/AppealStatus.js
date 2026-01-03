@@ -1,15 +1,284 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import API_BASE_URL from '../config/api';
+import { getToken, isAuthenticated } from '../utils/auth';
 import './AppealStatus.css';
 
 const AppealStatus = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
-  // Mock data - replace with API call
-  const appealData = {
-    appealId: id || '#20240715-001',
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [appealData, setAppealData] = useState(null);
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate('/login');
+      return;
+    }
+    fetchAppealData();
+  }, [id, navigate]);
+
+  const fetchAppealData = async () => {
+    try {
+      setLoading(true);
+      const token = getToken();
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/appeals/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const appeal = data.data.appeal;
+        
+        // Build timeline from status history
+        const timeline = [];
+        
+        // Initial submission
+        timeline.push({
+          name: 'Appeal Submitted',
+          completed: true,
+          date: formatDate(appeal.submittedAt || appeal.createdAt),
+          description: 'Your appeal has been successfully submitted and received by our system.',
+        });
+
+        // Check status history for other events
+        if (appeal.statusHistory && appeal.statusHistory.length > 0) {
+          appeal.statusHistory.forEach((history, index) => {
+            if (history.status === 'under-review') {
+              timeline.push({
+                name: 'Under Review',
+                completed: appeal.status !== 'pending',
+                current: appeal.status === 'under-review',
+                date: formatDate(history.changedAt),
+                description: 'A traffic officer is currently reviewing your appeal and evidence.',
+              });
+            } else if (history.status === 'approved') {
+              timeline.push({
+                name: 'Decision Made',
+                completed: true,
+                date: formatDate(history.changedAt),
+                description: 'Your appeal has been approved.',
+              });
+              timeline.push({
+                name: 'Appeal Resolved',
+                completed: true,
+                date: formatDate(history.changedAt),
+                description: 'Appeal process completed successfully.',
+              });
+            } else if (history.status === 'rejected') {
+              timeline.push({
+                name: 'Decision Made',
+                completed: true,
+                date: formatDate(history.changedAt),
+                description: 'A decision has been made on your appeal.',
+              });
+              timeline.push({
+                name: 'Appeal Resolved',
+                completed: true,
+                date: formatDate(history.changedAt),
+                description: appeal.adminNotes || 'Appeal process completed.',
+              });
+            }
+          });
+        } else {
+          // Fallback if no status history
+          if (appeal.status === 'under-review') {
+            timeline.push({
+              name: 'Under Review',
+              completed: true,
+              current: true,
+              date: formatDate(appeal.reviewedAt || appeal.updatedAt),
+              description: 'A traffic officer is currently reviewing your appeal and evidence.',
+            });
+            timeline.push({
+              name: 'Decision Made',
+              completed: false,
+              date: 'Pending',
+              description: 'A decision will be made based on the review of your appeal.',
+            });
+            timeline.push({
+              name: 'Appeal Resolved',
+              completed: false,
+              date: 'Pending',
+              description: 'You will be notified of the final decision and any required actions.',
+            });
+          } else if (appeal.status === 'approved' || appeal.status === 'rejected') {
+            timeline.push({
+              name: 'Under Review',
+              completed: true,
+              date: formatDate(appeal.reviewedAt || appeal.updatedAt),
+              description: 'Your appeal was reviewed by a traffic officer.',
+            });
+            timeline.push({
+              name: 'Decision Made',
+              completed: true,
+              date: formatDate(appeal.reviewedAt || appeal.updatedAt),
+              description: appeal.status === 'approved' ? 'Your appeal has been approved.' : 'A decision has been made on your appeal.',
+            });
+            timeline.push({
+              name: 'Appeal Resolved',
+              completed: true,
+              date: formatDate(appeal.reviewedAt || appeal.updatedAt),
+              description: appeal.status === 'approved' 
+                ? 'Appeal process completed successfully.' 
+                : (appeal.adminNotes || 'Appeal process completed.'),
+            });
+          } else {
+            timeline.push({
+              name: 'Under Review',
+              completed: false,
+              date: 'Pending',
+              description: 'A traffic officer will review your appeal and evidence.',
+            });
+            timeline.push({
+              name: 'Decision Made',
+              completed: false,
+              date: 'Pending',
+              description: 'A decision will be made based on the review of your appeal.',
+            });
+            timeline.push({
+              name: 'Appeal Resolved',
+              completed: false,
+              date: 'Pending',
+              description: 'You will be notified of the final decision and any required actions.',
+            });
+          }
+        }
+
+        setAppealData({
+          appealId: appeal._id,
+          violationId: appeal.violationId,
+          status: appeal.status,
+          statusColor: getStatusColor(appeal.status),
+          progress: getProgress(appeal.status),
+          submittedDate: formatDate(appeal.submittedAt || appeal.createdAt),
+          steps: timeline,
+          comments: appeal.statusHistory?.filter(h => h.notes).map(h => ({
+            officer: h.changedBy?.fullName || 'Admin',
+            officerId: h.changedBy?._id || 'N/A',
+            date: formatDate(h.changedAt),
+            time: formatTime(h.changedAt),
+            comment: h.notes,
+          })) || [],
+          violationDetails: {
+            violationId: appeal.violationId,
+            appealContext: appeal.appealReason?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'N/A',
+            submittedDate: formatDate(appeal.submittedAt || appeal.createdAt),
+            deadline: appeal.appealDeadline ? formatDate(appeal.appealDeadline) : 'N/A',
+          },
+          adminNotes: appeal.adminNotes,
+          reviewedBy: appeal.reviewedBy,
+          reviewedAt: appeal.reviewedAt,
+        });
+      } else {
+        if (response.status === 403) {
+          setError('Access denied. You can only view your own appeals.');
+        } else {
+          setError(data.message || 'Failed to fetch appeal');
+        }
+      }
+    } catch (error) {
+      console.error('Appeal fetch error:', error);
+      setError('Network error. Please check if backend is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'info';
+      case 'under-review':
+        return 'warning';
+      case 'approved':
+        return 'success';
+      case 'rejected':
+        return 'rejected';
+      default:
+        return 'info';
+    }
+  };
+
+  const getProgress = (status) => {
+    switch (status) {
+      case 'pending':
+        return 1;
+      case 'under-review':
+        return 2;
+      case 'approved':
+      case 'rejected':
+        return 4;
+      default:
+        return 1;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="appeal-status-page">
+        <div className="page-content">
+          <div className="loading-container">
+            <p>Loading appeal status...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error && !appealData) {
+    return (
+      <div className="appeal-status-page">
+        <div className="page-content">
+          <div className="error-message" style={{ 
+            padding: '15px', 
+            margin: '20px 0', 
+            backgroundColor: '#ffebee', 
+            color: '#c62828', 
+            borderRadius: '4px' 
+          }}>
+            {error}
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!appealData) {
+    return null;
+  }
+   /* appealId: id || '#20240715-001',
     violationId: 'VIOL-2025-001234',
     status: 'Under Review',
     statusColor: 'warning',
@@ -58,7 +327,7 @@ const AppealStatus = () => {
       fine: 'Rs. 2,500'
     }
   };
-
+*/
   return (
     <div className="appeal-status-page">
       <div className="page-content">
@@ -67,35 +336,47 @@ const AppealStatus = () => {
             <h1 className="form-title">Appeal Status</h1>
           </div>
 
+          {error && (
+            <div className="error-message" style={{ 
+              padding: '15px', 
+              margin: '20px 0', 
+              backgroundColor: '#ffebee', 
+              color: '#c62828', 
+              borderRadius: '4px' 
+            }}>
+              {error}
+            </div>
+          )}
+
           <div className="appeal-header-card">
             <div className="appeal-id-section">
               <span className="appeal-id-label">Appeal ID</span>
-              <h2 className="appeal-id-value">{appealData.appealId}</h2>
+              <h2 className="appeal-id-value">{appealData.appealId.substring(0, 8).toUpperCase()}</h2>
             </div>
             <div className="status-badge-large">
               <span className={`status-indicator-dot ${appealData.statusColor}`}></span>
-              <span className="status-text">{appealData.status}</span>
+              <span className="status-text">{appealData.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
             </div>
           </div>
 
           <div className="violation-summary-card">
-            <h3 className="summary-title">Related Violation</h3>
+            <h3 className="summary-title">Appeal Information</h3>
             <div className="summary-grid">
               <div className="summary-item">
                 <span className="summary-label">Violation ID</span>
                 <span className="summary-value">{appealData.violationId}</span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">Type</span>
-                <span className="summary-value">{appealData.violationDetails.type}</span>
+                <span className="summary-label">Appeal Context</span>
+                <span className="summary-value">{appealData.violationDetails.appealContext}</span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">Location</span>
-                <span className="summary-value">{appealData.violationDetails.location}</span>
+                <span className="summary-label">Submitted Date</span>
+                <span className="summary-value">{appealData.violationDetails.submittedDate}</span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">Fine Amount</span>
-                <span className="summary-value">{appealData.violationDetails.fine}</span>
+                <span className="summary-label">Appeal Deadline</span>
+                <span className="summary-value">{appealData.violationDetails.deadline}</span>
               </div>
             </div>
             <Link to={`/violation-details/${appealData.violationId}`} className="view-violation-link">
@@ -142,32 +423,59 @@ const AppealStatus = () => {
             </div>
           </div>
 
-          <div className="comments-section">
-            <h3 className="comments-title">Officer Updates & Comments</h3>
-            {appealData.comments.map((comment, index) => (
-              <div key={index} className="comment-card">
-                <div className="comment-header-section">
-                  <div className="comment-avatar">
-                    <img 
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
-                      alt="Officer" 
-                      onError={(e) => {
-                        e.target.src = 'https://ui-avatars.com/api/?name=Officer+Ramirez&background=1280ED&color=fff&size=200';
-                      }}
-                    />
+          {appealData.comments.length > 0 && (
+            <div className="comments-section">
+              <h3 className="comments-title">Admin Updates & Comments</h3>
+              {appealData.comments.map((comment, index) => (
+                <div key={index} className="comment-card">
+                  <div className="comment-header-section">
+                    <div className="comment-avatar">
+                      <div style={{
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '50%',
+                        backgroundColor: '#1280ED',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                      }}>
+                        {comment.officer.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+                      </div>
+                    </div>
+                    <div className="comment-meta">
+                      <h4 className="comment-author">{comment.officer}</h4>
+                      <p className="comment-date-time">{comment.date} at {comment.time}</p>
+                    </div>
                   </div>
-                  <div className="comment-meta">
-                    <h4 className="comment-author">{comment.officer}</h4>
-                    <p className="comment-officer-id">ID: {comment.officerId}</p>
-                    <p className="comment-date-time">{comment.date} at {comment.time}</p>
+                  <div className="comment-text-wrapper">
+                    <p className="comment-text">{comment.comment}</p>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+
+          {appealData.adminNotes && appealData.status !== 'pending' && (
+            <div className="comments-section">
+              <h3 className="comments-title">Admin Decision</h3>
+              <div className="comment-card">
                 <div className="comment-text-wrapper">
-                  <p className="comment-text">{comment.comment}</p>
+                  <p className="comment-text">
+                    <strong>{appealData.status === 'approved' ? 'Approved: ' : 'Rejected: '}</strong>
+                    {appealData.adminNotes}
+                  </p>
+                  {appealData.reviewedAt && (
+                    <p style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+                      Reviewed on: {formatDate(appealData.reviewedAt)} at {formatTime(appealData.reviewedAt)}
+                    </p>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
 
           <div className="help-section">
             <h3 className="help-title">Need Assistance?</h3>
