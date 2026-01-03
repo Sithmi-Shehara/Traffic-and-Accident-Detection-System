@@ -1,17 +1,58 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import Footer from '../components/Footer';
+import API_BASE_URL from '../config/api';
+import { getToken, isAuthenticated } from '../utils/auth';
 import './SubmitAppeal.css';
 
 const SubmitAppeal = () => {
-  const [formData, setFormData] = useState({
-    violationId: '',
-    appealReason: '',
-    description: '',
-    evidence: null,
-    declaration: false,
-  });
+  const { violationId: urlViolationId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    violationId: urlViolationId || location.state?.violationId || '',
+    appealContext: '',
+    detailedExplanation: '',
+    evidence: null,
+    evidenceType: '',
+    otherContext: '',
+    declaration: false,
+    violationDate: '',
+  });
+  const [errors, setErrors] = useState({});
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [violationData, setViolationData] = useState(null);
+
+  // Check if user is logged in
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  // Fetch violation data if violation ID is provided
+  useEffect(() => {
+    if (formData.violationId) {
+      fetchViolationData(formData.violationId);
+    }
+  }, [formData.violationId]);
+
+  const fetchViolationData = async (violationId) => {
+    try {
+      const token = getToken();
+      // In a real system, you'd have a violations API endpoint
+      // For now, we'll simulate it or use the violation ID directly
+      // The violation date should come from the violation system
+      // For now, we'll set a default date (current date) but in production this should come from the violation record
+      setViolationData({
+        violationId: violationId,
+        violationDate: new Date(), // This should come from violation API
+      });
+    } catch (error) {
+      console.error('Error fetching violation data:', error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -19,13 +60,112 @@ const SubmitAppeal = () => {
       ...formData,
       [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value,
     });
+    // Clear error for this field when user types
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: '',
+      });
+    }
+    setError(''); // Clear general error
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement appeal submission logic
-    console.log('Submit Appeal:', formData);
-    navigate('/dashboard');
+    setError('');
+    setErrors({});
+    setLoading(true);
+
+    // Validate all required fields
+    const validationErrors = {};
+    
+    if (!formData.violationId || formData.violationId.trim().length === 0) {
+      validationErrors.violationId = 'Violation ID is required';
+    }
+    
+    if (!formData.appealContext) {
+      validationErrors.appealContext = 'Appeal context is required';
+    }
+    
+    if (formData.appealContext === 'other' && !formData.otherContext.trim()) {
+      validationErrors.otherContext = 'Please specify the appeal context';
+    }
+    
+    if (!formData.detailedExplanation || formData.detailedExplanation.trim().length < 50) {
+      validationErrors.detailedExplanation = 'Detailed explanation is required (minimum 50 characters)';
+    }
+    
+    if (!formData.evidence) {
+      validationErrors.evidence = 'Evidence upload is mandatory. Please provide supporting documents.';
+    }
+    
+    if (!formData.declaration) {
+      validationErrors.declaration = 'Please confirm the legal declaration';
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const token = getToken();
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('violationId', formData.violationId.trim().toUpperCase());
+      
+      // Use appealContext or otherContext
+      const appealReason = formData.appealContext === 'other' 
+        ? formData.otherContext.trim().toLowerCase().replace(/\s+/g, '-')
+        : formData.appealContext;
+      formDataToSend.append('appealReason', appealReason);
+      
+      formDataToSend.append('description', formData.detailedExplanation.trim());
+      
+      // Add violation date (required for deadline calculation)
+      if (violationData?.violationDate) {
+        formDataToSend.append('violationDate', violationData.violationDate.toISOString());
+      } else {
+        // Default to current date if not available (should come from violation system)
+        formDataToSend.append('violationDate', new Date().toISOString());
+      }
+      
+      if (formData.evidence) {
+        formDataToSend.append('evidence', formData.evidence);
+      }
+      
+      if (formData.evidenceType) {
+        formDataToSend.append('evidenceType', formData.evidenceType);
+      }
+
+      const response = await fetch(`${API_BASE_URL}/appeals`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataToSend,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Success - redirect to dashboard
+        navigate('/dashboard');
+      } else {
+        setError(data.message || 'Failed to submit appeal. Please try again.');
+      }
+    } catch (error) {
+      console.error('Appeal submission error:', error);
+      setError('Network error. Please check if backend is running.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDrop = (e) => {
@@ -52,74 +192,126 @@ const SubmitAppeal = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="appeal-form">
+            {error && (
+              <div className="error-message" style={{ 
+                color: 'red', 
+                padding: '10px', 
+                marginBottom: '15px',
+                backgroundColor: '#ffe6e6',
+                borderRadius: '5px'
+              }}>
+                {error}
+              </div>
+            )}
+
             <div className="form-group">
               <label htmlFor="violationId" className="form-label">
-                Violation ID
+                Violation ID <span style={{ color: 'red' }}>*</span>
               </label>
-              <div className="input-with-button">
-                <input
-                  type="text"
-                  id="violationId"
-                  name="violationId"
-                  value={formData.violationId}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="Enter violation ID"
-                  required
-                />
-                <button type="button" className="search-button">
-                  🔍
-                </button>
-              </div>
+              <input
+                type="text"
+                id="violationId"
+                name="violationId"
+                value={formData.violationId}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="Violation ID (auto-filled from violation)"
+                required
+                readOnly
+                style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+              />
+              {!formData.violationId && (
+                <p style={{ fontSize: '14px', color: '#666', marginTop: '4px' }}>
+                  Please navigate from a violation details page to auto-fill this field.
+                </p>
+              )}
             </div>
 
             <div className="form-group">
-              <label htmlFor="appealReason" className="form-label">
-                Appeal Reason
+              <label htmlFor="appealContext" className="form-label">
+                Appeal Context <span style={{ color: 'red' }}>*</span>
               </label>
               <select
-                id="appealReason"
-                name="appealReason"
-                value={formData.appealReason}
+                id="appealContext"
+                name="appealContext"
+                value={formData.appealContext}
                 onChange={handleChange}
-                className="form-select"
+                className={`form-select ${errors.appealContext ? 'input-error' : ''}`}
                 required
               >
-                <option value="">Select Appeal Reason</option>
-                <option value="incorrect-speed-limit">Incorrect Speed Limit</option>
-                <option value="wrong-vehicle">Wrong Vehicle</option>
-                <option value="emergency-situation">Emergency Situation</option>
-                <option value="technical-error">Technical Error</option>
-                <option value="other">Other</option>
+                <option value="">Select Appeal Context</option>
+                <option value="road-obstruction">Road Obstruction / Accident Ahead</option>
+                <option value="medical-emergency">Medical / Emergency Situation</option>
+                <option value="traffic-diversion">Traffic Diversion / Police Instruction</option>
+                <option value="environmental-weather">Environmental / Weather Condition</option>
+                <option value="incorrect-detection">Incorrect Detection Context</option>
+                <option value="other">Other (Specify)</option>
               </select>
+              {errors.appealContext && (
+                <span className="error-message-field">{errors.appealContext}</span>
+              )}
             </div>
 
+            {formData.appealContext === 'other' && (
+              <div className="form-group">
+                <label htmlFor="otherContext" className="form-label">
+                  Specify Appeal Context <span style={{ color: 'red' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  id="otherContext"
+                  name="otherContext"
+                  value={formData.otherContext}
+                  onChange={handleChange}
+                  className={`form-input ${errors.otherContext ? 'input-error' : ''}`}
+                  placeholder="Please specify your appeal context"
+                />
+                {errors.otherContext && (
+                  <span className="error-message-field">{errors.otherContext}</span>
+                )}
+              </div>
+            )}
+
             <div className="form-group">
-              <label htmlFor="description" className="form-label">
-                Description
+              <label htmlFor="detailedExplanation" className="form-label">
+                Detailed Explanation <span style={{ color: 'red' }}>*</span>
               </label>
               <textarea
-                id="description"
-                name="description"
-                value={formData.description}
+                id="detailedExplanation"
+                name="detailedExplanation"
+                value={formData.detailedExplanation}
                 onChange={handleChange}
-                className="form-textarea"
+                className={`form-textarea ${errors.detailedExplanation ? 'input-error' : ''}`}
                 rows="6"
-                placeholder="Provide detailed description of your appeal..."
+                placeholder="Describe what happened and why the violation occurred (minimum 50 characters)..."
                 required
               />
+              <div style={{ marginTop: '4px', fontSize: '14px', color: '#666' }}>
+                {formData.detailedExplanation.length}/50 characters minimum
+              </div>
+              {errors.detailedExplanation && (
+                <span className="error-message-field">{errors.detailedExplanation}</span>
+              )}
             </div>
 
             <div className="form-group">
-              <label className="form-label">Upload Evidence</label>
+              <label className="form-label">
+                Upload Evidence <span style={{ color: 'red' }}>*</span>
+              </label>
+              <p style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+                Evidence is required to support your appeal. Please upload images, videos, or documents.
+              </p>
               <div
-                className="file-upload-area"
+                className={`file-upload-area ${errors.evidence ? 'upload-error' : ''}`}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
               >
                 <div className="upload-content">
                   <p className="upload-text-primary">Drag and drop files here</p>
                   <p className="upload-text-secondary">Or click to browse</p>
+                  <p style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>
+                    Accepted: Images, Videos, Documents (PDF, DOC, DOCX)
+                  </p>
                 </div>
                 <input
                   type="file"
@@ -127,12 +319,38 @@ const SubmitAppeal = () => {
                   name="evidence"
                   onChange={handleChange}
                   className="file-input"
-                  accept="image/*,.pdf"
+                  accept="image/*,video/*,.pdf,.doc,.docx"
+                  required
                 />
               </div>
               {formData.evidence && (
-                <p className="file-name">{formData.evidence.name}</p>
+                <p className="file-name" style={{ color: '#4CAF50', marginTop: '8px' }}>
+                  ✓ {formData.evidence.name}
+                </p>
               )}
+              {errors.evidence && (
+                <span className="error-message-field">{errors.evidence}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="evidenceType" className="form-label">
+                Evidence Type (Optional)
+              </label>
+              <select
+                id="evidenceType"
+                name="evidenceType"
+                value={formData.evidenceType}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="">Select Evidence Type</option>
+                <option value="accident-photo">Accident Photo</option>
+                <option value="video-recording">Video Recording</option>
+                <option value="medical-proof">Medical Proof</option>
+                <option value="witness-proof">Witness Proof</option>
+                <option value="other-document">Other Document</option>
+              </select>
             </div>
 
             <div className="form-group">
@@ -143,18 +361,27 @@ const SubmitAppeal = () => {
                   name="declaration"
                   checked={formData.declaration}
                   onChange={handleChange}
-                  className="checkbox-input"
+                  className={`checkbox-input ${errors.declaration ? 'input-error' : ''}`}
                   required
                 />
                 <label htmlFor="declaration" className="checkbox-label">
                   I declare that the information provided is true and accurate 
-                  to the best of my knowledge.
+                  to the best of my knowledge. <span style={{ color: 'red' }}>*</span>
                 </label>
               </div>
+              {errors.declaration && (
+                <span className="error-message-field" style={{ marginLeft: '32px' }}>
+                  {errors.declaration}
+                </span>
+              )}
             </div>
 
-            <button type="submit" className="submit-button">
-              Submit Appeal
+            <button 
+              type="submit" 
+              className="submit-button"
+              disabled={loading}
+            >
+              {loading ? 'Submitting...' : 'Submit Appeal'}
             </button>
           </form>
         </div>
