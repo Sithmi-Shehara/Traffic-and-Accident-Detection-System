@@ -1,13 +1,113 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
+import API_BASE_URL from '../config/api';
+import { getToken, isAuthenticated } from '../utils/auth';
 import './AppealStatusTracking.css';
 
 const AppealStatusTracking = () => {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [appeals, setAppeals] = useState([]);
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    underReview: 0,
+    approved: 0,
+    rejected: 0,
+  });
 
-  // Mock data - replace with API call
-  const appeals = [
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate('/login');
+      return;
+    }
+    fetchAppeals();
+  }, [navigate, filter]);
+
+  const fetchAppeals = async () => {
+    try {
+      setLoading(true);
+      const token = getToken();
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const statusParam = filter !== 'all' ? `&status=${filter}` : '';
+      const response = await fetch(`${API_BASE_URL}/appeals?page=1&limit=100${statusParam}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const appealsList = data.data.appeals || [];
+        setAppeals(appealsList);
+        
+        // Calculate stats
+        const total = data.total || appealsList.length;
+        const pending = appealsList.filter(a => a.status === 'pending').length;
+        const underReview = appealsList.filter(a => a.status === 'under-review').length;
+        const approved = appealsList.filter(a => a.status === 'approved').length;
+        const rejected = appealsList.filter(a => a.status === 'rejected').length;
+        
+        setStats({
+          total,
+          pending,
+          underReview,
+          approved,
+          rejected,
+        });
+      } else {
+        setError(data.message || 'Failed to fetch appeals');
+      }
+    } catch (error) {
+      console.error('Appeals fetch error:', error);
+      setError('Network error. Please check if backend is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const getStatusInfo = (status) => {
+    switch (status) {
+      case 'pending':
+        return { label: 'Pending', color: 'info', progress: 1 };
+      case 'under-review':
+        return { label: 'Under Review', color: 'warning', progress: 2 };
+      case 'approved':
+        return { label: 'Approved', color: 'success', progress: 4, result: 'Approved' };
+      case 'rejected':
+        return { label: 'Rejected', color: 'rejected', progress: 4, result: 'Rejected' };
+      default:
+        return { label: status, color: 'info', progress: 1 };
+    }
+  };
+
+ /* const filteredAppeals = filter === 'all' 
+    ? appeals 
+    : appeals.filter(appeal => {
+        if (filter === 'pending') return appeal.status === 'pending';
+        if (filter === 'under-review') return appeal.status === 'under-review';
+        if (filter === 'approved') return appeal.status === 'approved';
+        if (filter === 'rejected') return appeal.status === 'rejected';
+        return true;
+      });
     {
       id: '20240715-001',
       violationId: 'VIOL-2025-001234',
@@ -60,15 +160,20 @@ const AppealStatusTracking = () => {
       progress: 1,
       fine: 'Rs. 1,500'
     }
-  ];
+  ];*/
+  const filteredAppeals = filter === 'all'
+  ? appeals
+  : appeals.filter(appeal => appeal.status === filter);
 
-  const filteredAppeals = filter === 'all' 
+
+  /*const filteredAppeals = filter === 'all' 
     ? appeals 
     : appeals.filter(appeal => {
         if (filter === 'pending') return appeal.progress < 4;
         if (filter === 'resolved') return appeal.progress === 4;
         return true;
       });
+      */
 
   const getStatusBadgeClass = (statusColor) => {
     const classes = {
@@ -91,114 +196,151 @@ const AppealStatusTracking = () => {
             </p>
           </div>
 
+          {error && (
+            <div className="error-message" style={{ 
+              padding: '15px', 
+              margin: '20px 0', 
+              backgroundColor: '#ffebee', 
+              color: '#c62828', 
+              borderRadius: '4px' 
+            }}>
+              {error}
+            </div>
+          )}
+
           <div className="filter-section">
             <div className="filter-buttons">
               <button 
                 className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
                 onClick={() => setFilter('all')}
               >
-                All Appeals ({appeals.length})
+                All Appeals ({stats.total})
               </button>
               <button 
                 className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
                 onClick={() => setFilter('pending')}
               >
-                Pending ({appeals.filter(a => a.progress < 4).length})
+                Pending ({stats.pending})
               </button>
               <button 
-                className={`filter-btn ${filter === 'resolved' ? 'active' : ''}`}
-                onClick={() => setFilter('resolved')}
+                className={`filter-btn ${filter === 'under-review' ? 'active' : ''}`}
+                onClick={() => setFilter('under-review')}
               >
-                Resolved ({appeals.filter(a => a.progress === 4).length})
+                Under Review ({stats.underReview})
+              </button>
+              <button 
+                className={`filter-btn ${filter === 'approved' ? 'active' : ''}`}
+                onClick={() => setFilter('approved')}
+              >
+                Approved ({stats.approved})
+              </button>
+              <button 
+                className={`filter-btn ${filter === 'rejected' ? 'active' : ''}`}
+                onClick={() => setFilter('rejected')}
+              >
+                Rejected ({stats.rejected})
               </button>
             </div>
           </div>
 
-          <div className="appeals-list">
-            {filteredAppeals.length === 0 ? (
-              <div className="empty-state">
-                <p>No appeals found matching your filter.</p>
-              </div>
-            ) : (
-              filteredAppeals.map((appeal) => (
-                <Link 
-                  key={appeal.id} 
-                  to={`/appeal-status/${appeal.id}`}
-                  className="appeal-card-link"
-                >
-                  <div className="appeal-card">
-                    <div className="appeal-card-header">
-                      <div className="appeal-id-section">
-                        <span className="appeal-id-label">Appeal ID</span>
-                        <h3 className="appeal-id">{appeal.id}</h3>
-                      </div>
-                      <div className={`status-badge ${getStatusBadgeClass(appeal.statusColor)}`}>
-                        <span className="status-dot"></span>
-                        <span className="status-text">{appeal.status}</span>
-                      </div>
-                    </div>
+          {loading ? (
+            <div className="loading-container">
+              <p>Loading appeals...</p>
+            </div>
+          ) : (
+            <div className="appeals-list">
+              {filteredAppeals.length === 0 ? (
+                <div className="empty-state">
+                  <p>No appeals found matching your filter.</p>
+                </div>
+              ) : (
+                filteredAppeals.map((appeal) => {
+                  const statusInfo = getStatusInfo(appeal.status);
+                  return (
+                    <Link 
+                      key={appeal._id} 
+                      to={`/appeal-status/${appeal._id}`}
+                      className="appeal-card-link"
+                    >
+                      <div className="appeal-card">
+                        <div className="appeal-card-header">
+                          <div className="appeal-id-section">
+                            <span className="appeal-id-label">Appeal ID</span>
+                            <h3 className="appeal-id">{appeal._id.substring(0, 8).toUpperCase()}</h3>
+                          </div>
+                          <div className={`status-badge ${getStatusBadgeClass(statusInfo.color)}`}>
+                            <span className="status-dot"></span>
+                            <span className="status-text">{statusInfo.label}</span>
+                          </div>
+                        </div>
 
-                    <div className="appeal-card-body">
-                      <div className="appeal-info-grid">
-                        <div className="info-item">
-                          <span className="info-label">Violation Type</span>
-                          <span className="info-value">{appeal.violationType}</span>
+                        <div className="appeal-card-body">
+                          <div className="appeal-info-grid">
+                            <div className="info-item">
+                              <span className="info-label">Appeal Context</span>
+                              <span className="info-value">
+                                {appeal.appealReason?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'N/A'}
+                              </span>
+                            </div>
+                            <div className="info-item">
+                              <span className="info-label">Violation ID</span>
+                              <span className="info-value">{appeal.violationId}</span>
+                            </div>
+                            <div className="info-item">
+                              <span className="info-label">Submitted Date</span>
+                              <span className="info-value">{formatDate(appeal.submittedAt || appeal.createdAt)}</span>
+                            </div>
+                            {appeal.appealDeadline && (
+                              <div className="info-item">
+                                <span className="info-label">Deadline</span>
+                                <span className="info-value">{formatDate(appeal.appealDeadline)}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="progress-section-mini">
+                            <div className="progress-bar-mini">
+                              <div 
+                                className="progress-fill-mini" 
+                                style={{ width: `${(statusInfo.progress / 4) * 100}%` }}
+                              ></div>
+                            </div>
+                            <span className="progress-text-mini">Step {statusInfo.progress} of 4</span>
+                          </div>
+
+                          {statusInfo.result && (
+                            <div className={`result-badge ${statusInfo.result.toLowerCase()}`}>
+                              {statusInfo.result === 'Approved' ? '✓ Approved' : '✗ Rejected'}
+                            </div>
+                          )}
                         </div>
-                        <div className="info-item">
-                          <span className="info-label">Violation ID</span>
-                          <span className="info-value">{appeal.violationId}</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">Submitted Date</span>
-                          <span className="info-value">{appeal.submittedDate}</span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">Fine Amount</span>
-                          <span className="info-value">{appeal.fine}</span>
+
+                        <div className="appeal-card-footer">
+                          <span className="view-details">View Details →</span>
                         </div>
                       </div>
-
-                      <div className="progress-section-mini">
-                        <div className="progress-bar-mini">
-                          <div 
-                            className="progress-fill-mini" 
-                            style={{ width: `${(appeal.progress / 4) * 100}%` }}
-                          ></div>
-                        </div>
-                        <span className="progress-text-mini">Step {appeal.progress} of 4</span>
-                      </div>
-
-                      {appeal.result && (
-                        <div className={`result-badge ${appeal.result.toLowerCase()}`}>
-                          {appeal.result === 'Approved' ? '✓ Approved' : '✗ Rejected'}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="appeal-card-footer">
-                      <span className="view-details">View Details →</span>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          )}
 
           <div className="stats-summary">
             <div className="stat-item">
-              <span className="stat-number">{appeals.length}</span>
+              <span className="stat-number">{stats.total}</span>
               <span className="stat-label">Total Appeals</span>
             </div>
             <div className="stat-item">
-              <span className="stat-number">{appeals.filter(a => a.progress < 4).length}</span>
+              <span className="stat-number">{stats.pending + stats.underReview}</span>
               <span className="stat-label">In Progress</span>
             </div>
             <div className="stat-item">
-              <span className="stat-number">{appeals.filter(a => a.progress === 4 && a.result === 'Approved').length}</span>
+              <span className="stat-number">{stats.approved}</span>
               <span className="stat-label">Approved</span>
             </div>
             <div className="stat-item">
-              <span className="stat-number">{appeals.filter(a => a.progress === 4 && a.result === 'Rejected').length}</span>
+              <span className="stat-number">{stats.rejected}</span>
               <span className="stat-label">Rejected</span>
             </div>
           </div>
@@ -210,4 +352,7 @@ const AppealStatusTracking = () => {
 };
 
 export default AppealStatusTracking;
+
+
+
 
