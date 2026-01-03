@@ -140,6 +140,8 @@ The UI design is optimized for web development with:
 This project is part of a Research Project year 4.
 
 ## Contributors
+Shehara I.G.D.S - IT22338334
+
 
 - Development Team
 
