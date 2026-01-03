@@ -193,6 +193,21 @@
   color: #856404;
 }
 
+.status-badge.under-review {
+  background-color: #D1ECF1;
+  color: #0C5460;
+}
+
+.status-badge.approved {
+  background-color: #D4EDDA;
+  color: #155724;
+}
+
+.status-badge.rejected {
+  background-color: #F8D7DA;
+  color: #721C24;
+}
+
 .status-badge.resolved {
   background-color: #D4EDDA;
   color: #155724;
