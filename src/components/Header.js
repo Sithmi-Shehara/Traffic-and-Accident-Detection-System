@@ -26,12 +26,13 @@ const Header = ({ isAdmin = false }) => {
     ? [
         { path: '/admin/dashboard', label: 'Dashboard' },
         { path: '/admin/appeals', label: 'Appeals' },
-        { path: '/admin/profile', label: 'Profile' },
+        { path: '/admin/profile', label: 'Admin Profile' },
       ]
     : [
         { path: '/dashboard', label: 'Dashboard' },
         { path: '/submit-appeal', label: 'Submit Appeal' },
         { path: '/appeal-tracking', label: 'My Appeals' },
+        { path: '/profile', label: 'Profile' },
       ];
 
   return (
