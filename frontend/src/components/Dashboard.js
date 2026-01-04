@@ -39,7 +39,7 @@ const Dashboard = () => {
   const handleAccidentsClick = () => {
     navigate('/accidents');
   };
-
+//add card for number plate detection
   const handleNumberPlateClick = () => {
     navigate('/number-plate');
   };
