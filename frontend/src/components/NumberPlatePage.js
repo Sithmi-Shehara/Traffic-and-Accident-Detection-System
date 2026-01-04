@@ -101,7 +101,7 @@ const NumberPlatePage = () => {
       </Box>
 
       <Grid container spacing={4}>
-        {/* Upload Section */}
+        {/*  Add Upload Section */}
         <Grid item xs={12} md={6}>
           <Card sx={{ borderRadius: 3, height: '100%' }}>
             <CardContent sx={{ p: 4 }}>
