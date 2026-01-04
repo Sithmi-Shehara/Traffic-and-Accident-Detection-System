@@ -129,11 +129,9 @@ The UI design is optimized for web development with:
 
 - Backend API integration
 - Authentication and authorization
-- Real-time updates
-- File upload functionality
-- Email notifications
-- Advanced filtering and search
+- Real-time updates enhancements
 - Analytics and reporting
+- Model Traing for the future predictions
 
 ## License
 
