@@ -56,7 +56,7 @@ def detect_plate():
         x1, y1, x2, y2 = map(int, box)
         plate_crop = img[y1:y2, x1:x2]
 
-        # OCR on cropped plate
+        # OCR on Cropped plate
         text = reader.readtext(plate_crop, detail=0, paragraph=False)
         plate_text = "".join(text).replace(" ", "")
 
