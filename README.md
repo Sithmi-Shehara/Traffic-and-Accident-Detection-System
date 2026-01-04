@@ -129,6 +129,9 @@ git clone <repository-url>
 cd Traffic-and-Accident-Detection-System
 git checkout Number-Plate-Detection
 
+---
+
+```bash
 ## 📦 Installation
 
 ### 2) Install Backend Dependencies
@@ -136,5 +139,4 @@ git checkout Number-Plate-Detection
 ```bash
 cd backend
 npm install
-
 
