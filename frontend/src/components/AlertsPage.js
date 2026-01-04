@@ -139,7 +139,7 @@ const AlertsPage = () => {
   };
 
   const handleSendAuthorityAlert = () => {
-    // In real app, this would call API to send authority alert
+    // In real app,this would call API to send authority alert
     alert('Sending alert to authority...');
   };
 
