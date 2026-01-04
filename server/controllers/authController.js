@@ -351,8 +351,15 @@ const updateProfilePhoto = async (req, res) => {
       });
     }
 
-    // Update profile photo path
-    user.profilePhoto = req.file.path;
+    // Update profile photo path - store relative path for static file serving
+    // req.file.path is absolute, we need relative path from uploads directory
+    // Static files are served at /uploads, so store path like 'profile-photos/filename.jpg'
+    const path = require('path');
+    const uploadsDir = path.join(__dirname, '../uploads');
+    let relativePath = path.relative(uploadsDir, req.file.path);
+    // Normalize path separators for cross-platform compatibility (Windows uses \, Unix uses /)
+    relativePath = relativePath.split(path.sep).join('/');
+    user.profilePhoto = relativePath;
     await user.save();
 
     res.status(200).json({
