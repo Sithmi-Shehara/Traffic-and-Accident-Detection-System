@@ -9,6 +9,7 @@ The system accepts an image, detects number plates, extracts the plate number te
 
 
 
+
 ### ✨Key Features
 📷 Upload an image via API
 
