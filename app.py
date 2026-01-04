@@ -65,7 +65,7 @@ def detect_plate():
             "plate_number": plate_text
         })
 
-        # Draw bounding box
+        # Draw bounding Box
         cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.putText(img, plate_text, (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
