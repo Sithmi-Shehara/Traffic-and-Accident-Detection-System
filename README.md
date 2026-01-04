@@ -63,7 +63,7 @@ Since the alerting mechanism is not finalized yet, the recommended approach is:
 - **Authority alerts:** **Webhook-based alerts** (POST to an authority service/dashboard endpoint)
 - Optional redundancy: email fallback for authorities (SendGrid/SMTP)
 
-> Implement notifications behind a provider interface so you can swap Twilio/webhooks later without rewriting the core pipeline.
+
 
 ---
 
@@ -121,154 +121,36 @@ Before running this application, make sure you have the following installed:
 
 ---
 
+
 ## 📦 Installation
 
-### 1) Clone the repository
+###  Clone the repository
 
-```bash
 git clone <repository-url>
 cd Traffic-and-Accident-Detection-System
 git checkout Number-Plate-Detection
 
 ---
+## 📦 Install Backend Dependencies
 
-2) Install Backend Dependencies
 cd backend
 npm install
 
-3) Install Frontend Dependencies
+---
+## 📦 Install Frontend Dependencies
+
 cd ../frontend
 npm install
 
-⚙️ Configuration
-Backend Setup
-1) Create Environment File
+---
 
-Create a .env file in the backend directory:
+## ⚙️ Configuration
 
-MONGODB_URI=mongodb://localhost:27017/traffic_violation
-JWT_SECRET=your_super_secret_jwt_key_here_change_this_in_production_123456789
-PORT=5000
+###  Backend Setup
 
-
-Note: Keep JWT_SECRET private and replace it for production deployments.
-
-2) Start MongoDB
-# On macOS with Homebrew
-brew services start mongodb/brew/mongodb-community
-
-# Or start manually
-mongod --dbpath /usr/local/var/mongodb
-
-Frontend Setup
-1) Create Environment File
-
-Create a .env file in the frontend directory:
-
-REACT_APP_API_URL=http://localhost:5001/api
-
-🎯 Running the Application
-Development Mode
-1) Start the Backend Server
-cd backend
-npm run dev
+git clone <repository-url>
+cd Traffic-and-Accident-Detection-System
+git checkout Number-Plate-Detection
 
 
-Backend runs at: http://localhost:5001
 
-2) Start the Frontend Development Server
-cd frontend
-npm start
-
-
-Frontend runs at: http://localhost:3000
-
-Production Build
-1) Build the Frontend
-cd frontend
-npm run build
-
-2) Start Backend in Production
-cd backend
-npm start
-
-Recommended Evaluation Metrics (For Presentation)
-
-OCR Accuracy (%)
-
-Clean dataset
-
-Each distortion type at 30% / 50% / 80%
-
-Unreadable Threshold per distortion type
-
-Tamper Detection Accuracy
-
-false positives / false negatives
-
-Latency
-
-frame received → OCR → verification → notification
-
-Suggested Project Structure (Module View)
-backend/
-├── services/
-│   ├── ocr/                       # EasyOCR integration service (if used via API)
-│   ├── preprocessing/             # Deblur/denoise/enhance/tilt correction
-│   ├── verification/              # DB lookup and validation
-│   ├── tamper-detection/          # Mismatch detection logic
-│   └── notifications/             # Twilio + Webhook (recommended)
-frontend/
-├── src/
-│   ├── pages/                     # UI pages
-│   ├── components/                # Reusable UI components
-│   └── services/                  # API client layer (fetch/axios)
-
-
-(Update this section if your actual structure differs.)
-
-Testing (Recommended)
-Manual Test Checklist (Marking Panel Friendly)
-
- OCR works on clear plates
-
- OCR works under blur/noise/low light/fog/glare/tilt
-
- Preprocessing improves recognition (before vs after)
-
- Plate verification returns correct DB details
-
- Tampered plates are flagged correctly
-
- Owner SMS alert triggers correctly (if enabled)
-
- Authority alert includes evidence reference and tamper status
-
-Known Limitations
-
-OCR depends on CCTV resolution and plate visibility (occlusion/extreme glare may reduce accuracy)
-
-Beyond certain distortion thresholds, plates become unreadable (tracked via evaluation)
-
-Tamper detection currently relies on mismatch logic and can be improved with additional signals
-
-Future Enhancements
-
-Multi-frame aggregation from video clips to improve OCR accuracy
-
-Fine-tuning OCR for local plate formats and fonts
-
-Enhanced tamper detection (font spacing, holograms, reflectivity cues)
-
-Scalable alerting via message queues (RabbitMQ/Kafka)
-
-Authority dashboard analytics and reporting
-
-License
-
-This project is part of a Year 4 Research Project.
-
-Contributors
-
-Development Team
-© 2024–2026. All rights reserved.
