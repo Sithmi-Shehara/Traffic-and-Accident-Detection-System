@@ -51,7 +51,7 @@ const NumberPlatePage = () => {
     setAnalyzing(true);
     setUploading(true);
     
-    // Simulate upload and analysis process
+    // Simulate upload & analysis process
     setTimeout(() => {
       setUploading(false);
     }, 2000);
