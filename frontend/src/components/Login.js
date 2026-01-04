@@ -17,23 +17,17 @@ import {
 import { Login as LoginIcon, Email, Lock } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
-
-//Added initial state for form data
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-
-  // Added error handling state
-
   const [error, setError] = useState('');
-  // Loading state added for UX improvement
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
   const navigate = useNavigate();
-// Added handleChange function for form inputs
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -41,7 +35,6 @@ const Login = () => {
     });
   };
 
-  // Added async submit handling for improved login flow
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -87,7 +80,7 @@ const Login = () => {
                 {error}
               </Alert>
             )}
-             {/* Form added  */}
+
             <Box component="form" onSubmit={handleSubmit}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -142,7 +135,6 @@ const Login = () => {
                 </Grid>
               </Grid>
             </Box>
-            {/* Signup link added */}
 
             <Box sx={{ textAlign: 'center', mt: 3 }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>

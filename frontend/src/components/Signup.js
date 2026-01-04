@@ -18,8 +18,6 @@ import { PersonAdd, Email, Lock, Person } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
-
-  //add state management for signup form
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -32,14 +30,13 @@ const Signup = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  //implement handleChange for form inputs
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-//implement handleSubmit function with validation
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -55,7 +52,6 @@ const Signup = () => {
       await register(formData.name, formData.email, formData.password);
       navigate('/dashboard');
     } catch (error) {
-      //add detailed error handling for signup
       if (error.response?.data?.message === 'User already exists') {
         setError('Email already exists. Please use a different email.');
       } else if (error.response?.data?.errors) {
@@ -103,7 +99,7 @@ const Signup = () => {
                 {error}
               </Alert>
             )}
- {/* design form card */}
+
             <Box component="form" onSubmit={handleSubmit}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>

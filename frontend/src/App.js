@@ -1,12 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Container } from '@mui/material';
+import { CssBaseline, Container, CircularProgress } from '@mui/material';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import theme from './theme';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
+
+import NumberPlatePage from './components/NumberPlatePage';
+import AlertsPage from './components/AlertsPage';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -42,6 +45,23 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/number-plate" 
+        element={
+          <ProtectedRoute>
+            <NumberPlatePage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/alerts" 
+        element={
+          <ProtectedRoute>
+            <AlertsPage />
           </ProtectedRoute>
         } 
       />

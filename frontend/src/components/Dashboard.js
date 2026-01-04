@@ -16,18 +16,38 @@ import {
   Person,
   ExitToApp,
   DirectionsCar,
-  Gavel,
-  CheckCircle
+  Warning, 
+  CheckCircle,
+  CreditCard,
+  Notifications
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
-//user details
+import { useNavigate } from 'react-router-dom';
+
 const Dashboard = () => {
   const { user, logout } = useAuth();
- // Added a separate handler for logout
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     logout();
   };
-//initial setup 
+
+  const handleViolationsClick = () => {
+    navigate('/violations');
+  };
+
+  const handleAccidentsClick = () => {
+    navigate('/accidents');
+  };
+
+  const handleNumberPlateClick = () => {
+    navigate('/number-plate');
+  };
+
+  const handleAlertsClick = () => {
+    navigate('/alerts');
+  };
+
   const stats = [
     {
       title: 'Total Violations',
@@ -38,7 +58,7 @@ const Dashboard = () => {
     {
       title: 'Pending Cases',
       value: '0',
-      icon: <Gavel />,
+      icon: <Warning />,
       color: 'warning'
     },
     {
@@ -70,7 +90,6 @@ const Dashboard = () => {
             flexWrap: 'wrap',
             gap: 2
           }}>
-             {/* Dashboard branding area */}
             
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
@@ -85,16 +104,22 @@ const Dashboard = () => {
                 </Typography>
               </Box>
             </Box>
-             {/* User information and logout controls */}
             
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Button
+                variant="outlined"
+                startIcon={<Notifications />}
+                onClick={handleAlertsClick}
+                sx={{ borderRadius: 2, mr: 1 }}
+              >
+                Alerts
+              </Button>
               <Chip 
                 icon={<Person />} 
                 label={user?.email} 
                 variant="outlined"
                 sx={{ display: { xs: 'none', sm: 'flex' } }}
               />
-               {/* Logout action placed in header for quick access */}
               <Button
                 variant="contained"
                 color="error"
@@ -120,14 +145,71 @@ const Dashboard = () => {
               Monitor and manage traffic violations efficiently. Access real-time data, 
               track case progress, and ensure compliance with traffic regulations.
             </Typography>
-              {/* Highlighting key features for clarity */}
-
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <Chip label="Real-time Monitoring" color="primary" variant="outlined" />
               <Chip label="Case Management" color="secondary" variant="outlined" />
               <Chip label="Analytics Dashboard" color="success" variant="outlined" />
             </Box>
           </CardContent>
+
+          {/* Quick Actions */}
+          <Card sx={{ borderRadius: 3 }}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h5" gutterBottom fontWeight="bold">
+                Quick Actions
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Button 
+                    fullWidth 
+                    variant="outlined" 
+                    startIcon={<DirectionsCar />}
+                    onClick={handleViolationsClick}
+                    sx={{ p: 2, borderRadius: 2, flexDirection: 'column', gap: 1 }}
+                  >
+                    <Typography variant="body2" fontWeight="bold">
+                    Identify Violations
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Detect traffic violations
+                    </Typography>
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Button 
+                    fullWidth 
+                    variant="outlined" 
+                    startIcon={<Warning />}
+                    onClick={handleAccidentsClick}
+                    sx={{ p: 2, borderRadius: 2, flexDirection: 'column', gap: 1 }}
+                  >
+                    <Typography variant="body2" fontWeight="bold">
+                      Identify Accidents
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Detect road accidents
+                    </Typography>
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Button 
+                    fullWidth 
+                    variant="outlined" 
+                    startIcon={<CreditCard />}
+                    onClick={handleNumberPlateClick}
+                    sx={{ p: 2, borderRadius: 2, flexDirection: 'column', gap: 1 }}
+                  >
+                    <Typography variant="body2" fontWeight="bold">
+                      Number Plate Identify
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Detect license plates
+                    </Typography>
+                  </Button>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </Card>
 
         {/* Stats Cards */}
@@ -166,76 +248,7 @@ const Dashboard = () => {
           ))}
         </Grid>
 
-        {/* Quick Actions */}
-        <Card sx={{ borderRadius: 3 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Typography variant="h5" gutterBottom fontWeight="bold">
-              Quick Actions
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Button 
-                  fullWidth 
-                  variant="outlined" 
-                  startIcon={<DirectionsCar />}
-                  sx={{ p: 2, borderRadius: 2, flexDirection: 'column', gap: 1 }}
-                >
-                  <Typography variant="body2" fontWeight="bold">
-                    New Violation
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Record incident
-                  </Typography>
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Button 
-                  fullWidth 
-                  variant="outlined" 
-                  startIcon={<Gavel />}
-                  sx={{ p: 2, borderRadius: 2, flexDirection: 'column', gap: 1 }}
-                >
-                  <Typography variant="body2" fontWeight="bold">
-                    View Cases
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Manage violations
-                  </Typography>
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Button 
-                  fullWidth 
-                  variant="outlined" 
-                  startIcon={<CheckCircle />}
-                  sx={{ p: 2, borderRadius: 2, flexDirection: 'column', gap: 1 }}
-                >
-                  <Typography variant="body2" fontWeight="bold">
-                    Reports
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Generate reports
-                  </Typography>
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <Button 
-                  fullWidth 
-                  variant="outlined" 
-                  startIcon={<Person />}
-                  sx={{ p: 2, borderRadius: 2, flexDirection: 'column', gap: 1 }}
-                >
-                  <Typography variant="body2" fontWeight="bold">
-                    Profile
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Account settings
-                  </Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
+        
       </Container>
     </Box>
   );
