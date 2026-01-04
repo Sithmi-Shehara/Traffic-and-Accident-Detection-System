@@ -82,7 +82,7 @@ const NumberPlatePage = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Header */}
+      {/* Header of the page */}
       <Box sx={{ mb: 4 }}>
         <Button
           startIcon={<ArrowBack />}
