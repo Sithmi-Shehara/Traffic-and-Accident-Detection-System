@@ -36,7 +36,7 @@ def detect_plate():
     input_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(input_path)
 
-    # Read image
+    # Read Image
     img = cv2.imread(input_path)
 
     # Run YOLO model
