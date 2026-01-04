@@ -329,7 +329,7 @@ const AlertsPage = () => {
                 </Paper>
               </Grid>
 
-              {/* Status Information */}
+              {/* Status Information  */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
                   <Typography variant="h6" gutterBottom color="primary">
