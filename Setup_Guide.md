@@ -56,7 +56,6 @@ Before running the project, make sure you have:
 
 ### 🚀 Setup Instructions (Windows)
 
-
 **Create Virtual Environment**
 ```bash
 python -m venv venv
