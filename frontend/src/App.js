@@ -9,6 +9,7 @@ import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 //add route to number plate page
 import NumberPlatePage from './components/NumberPlatePage';
+//add route to alerts page
 import AlertsPage from './components/AlertsPage';
 
 // Protected Route component
