@@ -45,7 +45,6 @@ The system accepts an image, detects number plates, extracts the plate number te
 
 
 
-
 ## 📋Prerequisites
 Before running the project, make sure you have:
 
