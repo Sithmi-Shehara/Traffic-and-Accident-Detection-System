@@ -63,7 +63,6 @@ Since the alerting mechanism is not finalized yet, the recommended approach is:
 - **Authority alerts:** **Webhook-based alerts** (POST to an authority service/dashboard endpoint)
 - Optional redundancy: email fallback for authorities (SendGrid/SMTP)
 
-> Implement notifications behind a provider interface so you can swap Twilio/webhooks later without rewriting the core pipeline.
 
 ---
 
@@ -129,4 +128,13 @@ Before running this application, make sure you have the following installed:
 git clone <repository-url>
 cd Traffic-and-Accident-Detection-System
 git checkout Number-Plate-Detection
+
+## 📦 Installation
+
+### 2) Install Backend Dependencies
+
+```bash
+cd backend
+npm install
+
 
