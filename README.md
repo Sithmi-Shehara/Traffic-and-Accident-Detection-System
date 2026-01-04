@@ -10,12 +10,12 @@ This module identifies vehicles involved in traffic violations by accurately ext
 ## Overview
 
 The Number Plate Detection component bridges violation detection and enforcement by:
-- receiving frames/clips from a real-time detection pipeline,
-- enhancing images using preprocessing,
-- extracting plate text using OCR,
-- verifying plate details via a database,
-- detecting plate tampering/fraud,
-- triggering notifications for faster enforcement.
+- Receiving frames/clips from a real-time detection pipeline
+- Enhancing images using preprocessing
+- Extracting plate text using OCR (EasyOCR)
+- Verifying plate details via a database
+- Detecting plate tampering/fraud
+- Triggering notifications for faster enforcement
 
 ---
 
@@ -63,6 +63,7 @@ Since the alerting mechanism is not finalized yet, the recommended approach is:
 - **Authority alerts:** **Webhook-based alerts** (POST to an authority service/dashboard endpoint)
 - Optional redundancy: email fallback for authorities (SendGrid/SMTP)
 
+> Implement notifications behind a provider interface so you can swap Twilio/webhooks later without rewriting the core pipeline.
 
 ---
 
@@ -114,8 +115,8 @@ This component forms the **core enforcement link** of the system. It ensures rel
 
 Before running this application, make sure you have the following installed:
 
-- **Node.js** (v16 or higher) - https://nodejs.org/
-- **MongoDB** - https://www.mongodb.com/try/download/community
+- **Node.js** (v16 or higher) — https://nodejs.org/
+- **MongoDB** — https://www.mongodb.com/try/download/community
 - **npm** or **yarn** package manager
 
 ---
@@ -128,15 +129,3 @@ Before running this application, make sure you have the following installed:
 git clone <repository-url>
 cd Traffic-and-Accident-Detection-System
 git checkout Number-Plate-Detection
-
----
-
-```bash
-## 📦 Installation
-
-### 2) Install Backend Dependencies
-
-```bash
-cd backend
-npm install
-
