@@ -172,7 +172,7 @@ const NumberPlatePage = () => {
           </Card>
         </Grid>
 
-        {/* Results Section */}
+        {/* Results  Section */}
         <Grid item xs={12} md={6}>
           <Card sx={{ borderRadius: 3, height: '100%' }}>
             <CardContent sx={{ p: 4 }}>
