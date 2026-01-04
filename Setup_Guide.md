@@ -144,7 +144,6 @@ OCR Ready!
 
 
 
-
 ## 🧠 How the System Works
 - Image is uploaded via API
 
