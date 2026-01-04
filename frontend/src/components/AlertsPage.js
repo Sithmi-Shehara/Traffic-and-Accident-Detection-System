@@ -134,7 +134,7 @@ const AlertsPage = () => {
   };
 
   const handleRetryOwnerSMS = () => {
-    // In real app, this would call API to retry SMS
+    // In real app,this would call API to retry SMS
     alert('Retrying SMS to owner...');
   };
 
