@@ -185,7 +185,7 @@ const AlertsPage = () => {
         </Typography>
       </Box>
 
-      {/* Alerts Table */}
+      {/* Alert Table */}
       <Card sx={{ borderRadius: 3 }}>
         <CardContent sx={{ p: 0 }}>
           <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
