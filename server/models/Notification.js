@@ -55,3 +55,4 @@ notificationSchema.methods.markAsRead = function () {
 module.exports = mongoose.model('Notification', notificationSchema);
 
 
+

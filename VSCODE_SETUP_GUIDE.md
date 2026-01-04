@@ -473,3 +473,4 @@ Traffic-and-Accident-Detection-System/
 - Check `CONNECT_FRONTEND_BACKEND.md` for connection setup
 
 
+

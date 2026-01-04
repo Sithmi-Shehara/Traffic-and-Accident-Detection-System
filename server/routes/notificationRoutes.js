@@ -18,3 +18,4 @@ router.put('/read-all', markAllNotificationsAsRead);
 module.exports = router;
 
 
+
