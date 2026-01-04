@@ -144,7 +144,7 @@ const AlertsPage = () => {
   };
 
   const handleViewEvidence = () => {
-    // In real app, this would open evidence viewer
+    // In real app,this would open evidence viewer
     alert('Opening evidence viewer...');
   };
 
