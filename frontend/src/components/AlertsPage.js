@@ -297,7 +297,7 @@ const AlertsPage = () => {
                 </Alert>
               </Grid>
 
-              {/* Violation Details */}
+              {/* Violation Detail */}
               <Grid item xs={12} md={6}>
                 <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
                   <Typography variant="h6" gutterBottom color="primary">
