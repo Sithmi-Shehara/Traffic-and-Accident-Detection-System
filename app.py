@@ -70,7 +70,7 @@ def detect_plate():
         cv2.putText(img, plate_text, (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 
-    # Save annotated image
+    # Save annotated Image
     cv2.imwrite(output_path, img)
 
     return jsonify({
