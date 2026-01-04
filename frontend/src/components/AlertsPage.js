@@ -34,7 +34,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-// Sample data - in real app this would come from API
+//  Add Sample data - in real app this would come from API
 const alertsData = [
   {
     id: "TV-2024-001",
