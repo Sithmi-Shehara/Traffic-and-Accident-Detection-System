@@ -39,7 +39,7 @@ def detect_plate():
     # Read Image
     img = cv2.imread(input_path)
 
-    # Run YOLO model
+    # Run YOLO Model
     results = model(img)
 
     if len(results[0].boxes) == 0:
