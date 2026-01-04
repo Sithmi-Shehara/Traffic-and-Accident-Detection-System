@@ -72,6 +72,7 @@ pip install flask ultralytics opencv-python easyocr Werkzeug torch
     - ⏳ First-time installation may take a few minutes (PyTorch & OCR models).
 ```
 
+
 **Running the Application**
 ```bash
 python app.py
