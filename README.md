@@ -1,7 +1,8 @@
 # 🚦Number Plate Detection in Adverse Weather Conditions
 
 **Repository: Traffic-and-Accident-Detection-System**
-**Branch: Number-Plate-Detection**
+
+##### Branch: Number-Plate-Detection
 
 
 ### 📖 Overview
