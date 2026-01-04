@@ -260,7 +260,7 @@ const AlertsPage = () => {
         </CardContent>
       </Card>
 
-      {/* Violation Details Modal */}
+      {/* Violation Detail Modal */}
       <Dialog 
         open={open} 
         onClose={handleClose}
