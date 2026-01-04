@@ -1,7 +1,6 @@
 # 🚗 Number Plate Detection & Recognition API
 
 
-
 ### 📖 Overview
 This project is a Flask-based REST API for automatic vehicle number plate detection and recognition using YOLO (Ultralytics) for object detection and EasyOCR for text extraction.
 
