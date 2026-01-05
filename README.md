@@ -1,148 +1,211 @@
-# Citizen Appeal Management System
+🚦 Traffic Violation and Accident Detection System
 
-A professional web frontend application for the Traffic and Accident Detection System, built with React. This system allows citizens to submit appeals for traffic violations and enables administrators to review and manage these appeals through a modern, responsive web interface.
+Repository: Traffic-and-Accident-Detection-System
 
-## Features
+📝 Overview
 
-### Citizen Features
-- **Landing Page**: Informative homepage with "How It Works" section
-- **User Registration**: Complete registration form with validation
-- **User Login**: Secure login interface
-- **Citizen Dashboard**: View appeal statistics and recent appeals
-- **Submit Appeal**: Submit new appeals with evidence upload
-- **Appeal Status Tracking**: Track appeal progress with step-by-step visualization
-- **Violation Details**: View detailed violation information
+The Traffic Violation and Accident Detection System is a smart traffic enforcement and monitoring platform designed to improve road safety using computer vision, deep learning, and real-time data processing.
 
-### Admin Features
-- **Admin Dashboard**: Overview of all appeals with statistics and charts
-- **Appeal Review**: Review appeals with ML confidence scores and make decisions
+The system analyzes CCTV camera feeds from road intersections and roadside locations to automatically detect traffic violations, identify vehicles, assess accident severity, and enable transparent communication between citizens and authorities.
 
-## Technology Stack
+This project integrates AI-powered backend modules with a modern web-based frontend system to provide an end-to-end smart traffic management solution.
 
-- **React 18.2.0**: Frontend framework
-- **React Router DOM 6.20.0**: Routing and navigation
-- **CSS3**: Custom styling with blue theme
-- **Public Sans Font**: Professional typography
+🧩 Core System Components
+🚥 1. Traffic Violation Detection Module
 
-## Installation
+Detects traffic rule violations directly from CCTV feeds.
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd Traffic-and-Accident-Detection-System
-```
+Key Features
 
-2. Install dependencies:
-```bash
-npm install
-```
+Real-time seat belt violation detection
 
-3. Start the development server:
-```bash
-npm start
-```
+Red-light violation detection
 
-The application will open at `http://localhost:3000`
+Vehicle tracking relative to stop lines
 
-## Project Structure
+Evidence-based enforcement using captured frames
 
-```
+🔢 2. Number Plate Detection in Adverse Weather Conditions
+
+Identifies violating vehicles under challenging conditions.
+
+Key Features
+
+License plate recognition under blur, fog, noise, glare, and low light
+
+OCR accuracy evaluation under distortion levels
+
+Tampered plate detection
+
+Vehicle verification via registration database
+
+Real-time alerts to owners and authorities
+
+🚑 3. Accident Severity Assessment & Emergency Alerts
+
+Automatically detects accidents and triggers emergency alerts.
+
+Key Features
+
+Accident detection from CCTV feeds
+
+Vehicle speed estimation
+
+Severity classification (Low / Medium / High)
+
+Fire and hazard detection
+
+Automated alerts via SMS, WhatsApp, Email, and Voice
+
+Escalation mechanisms and offline SMS fallback
+
+🌐 4. Citizen Appeal Management System (Frontend)
+
+Frontend Web Application – Developed by Shehara I.G.D.S
+
+A professional React-based web frontend that allows citizens to submit and track traffic violation appeals and enables administrators to review, approve, or reject appeals transparently.
+
+This component improves citizen transparency, accountability, and trust in the automated traffic enforcement system.
+
+✨ Features
+👤 Citizen Features
+
+Landing page with How It Works section
+
+User registration with validation
+
+Secure login system
+
+Citizen dashboard with appeal statistics
+
+Submit appeals with evidence upload
+
+Step-by-step appeal status tracking
+
+View detailed violation information
+
+🛡️ Admin Features
+
+Admin dashboard with appeal statistics
+
+Review appeals with ML confidence scores
+
+Approve or reject appeals
+
+🛠️ Technology Stack (Frontend)
+
+React 18.2.0
+
+React Router DOM 6.20.0
+
+CSS3 (custom professional blue theme)
+
+Public Sans Font
+
+🎨 UI & Design Highlights
+
+Clean and modern web interface
+
+Responsive design (desktop-first, mobile-friendly)
+
+Card-based layouts with shadows
+
+Professional blue color scheme
+
+Intuitive navigation and user-friendly forms
+
+📁 Frontend Project Structure
 src/
 ├── components/
-│   ├── Header.js              # Top navigation header
-│   ├── Header.css
-│   ├── Footer.js              # Professional web footer
-│   └── Footer.css
+│   ├── Header.js
+│   ├── Footer.js
 ├── pages/
-│   ├── LandingPage.js         # Public landing page
-│   ├── LandingPage.css
-│   ├── LoginPage.js           # User login
-│   ├── LoginPage.css
-│   ├── RegisterPage.js        # User registration
-│   ├── RegisterPage.css
-│   ├── CitizenDashboard.js    # Citizen dashboard
-│   ├── CitizenDashboard.css
-│   ├── SubmitAppeal.js        # Submit appeal form
-│   ├── SubmitAppeal.css
-│   ├── AppealStatus.js        # Appeal status tracking
-│   ├── AppealStatus.css
-│   ├── ViolationDetails.js    # Violation details view
-│   ├── ViolationDetails.css
-│   ├── AdminDashboard.js      # Admin dashboard
-│   ├── AdminDashboard.css
-│   ├── AppealReview.js        # Admin appeal review
-│   └── AppealReview.css
-├── App.js                     # Main app component with routing
-├── App.css                    # Global styles and theme variables
-├── index.js                   # Entry point
-└── index.css                  # Base styles
-```
+│   ├── LandingPage.js
+│   ├── LoginPage.js
+│   ├── RegisterPage.js
+│   ├── CitizenDashboard.js
+│   ├── SubmitAppeal.js
+│   ├── AppealStatus.js
+│   ├── ViolationDetails.js
+│   ├── AdminDashboard.js
+│   └── AppealReview.js
+├── App.js
+├── index.js
+└── index.css
 
-## Color Theme
+🚀 Installation & Setup
+📋 Prerequisites
 
-The application uses a professional blue theme:
+Node.js (v16 or higher)
 
-- **Primary Blue**: `#1280ED`
-- **Primary Blue Dark**: `#0A73D9`
-- **Secondary Blue**: `#E8EDF2`
-- **Text Primary**: `#0D141C`
-- **Text Secondary**: `#4D7399`
-- **Background White**: `#FFFFFF`
-- **Background Light**: `#F7FAFC`
-- **Border Color**: `#CFDBE8`
-- **Success Green**: `#088738`
+MongoDB
 
-## Routes
+npm or yarn
 
-- `/` - Landing page
-- `/login` - User login
-- `/register` - User registration
-- `/dashboard` - Citizen dashboard
-- `/submit-appeal` - Submit new appeal
-- `/appeal-status/:id` - View appeal status
-- `/violation-details/:id` - View violation details
-- `/admin/dashboard` - Admin dashboard
-- `/admin/appeal-review/:id` - Admin appeal review
-
-## Development
-
-### Available Scripts
-
-- `npm start`: Runs the app in development mode
-- `npm build`: Builds the app for production
-- `npm test`: Launches the test runner
-
-## Design
-
-The UI design is optimized for web development with:
-- Clean, modern web interface
-- Professional top navigation header
-- Comprehensive footer with links and contact information
-- Responsive design that works on all screen sizes
-- Professional blue color scheme (#1280ED)
-- Desktop-first approach with mobile responsiveness
-- Card-based layouts with shadows and borders
-- Professional images and visual elements
-- Intuitive navigation and user-friendly forms
-
-## Future Enhancements
-
-- Backend API integration
-- Authentication and authorization
-- Real-time updates enhancements
-- Analytics and reporting
-- Model Traing for the future predictions
-
-## License
-
-This project is part of a Research Project year 4.
-
-## Contributors
-Shehara I.G.D.S - IT22338334
+🔧 Backend Setup
+cd backend
+npm install
+npm run dev
 
 
-- Development Team
+Create .env file:
 
----
+MONGODB_URI=mongodb://localhost:27017/traffic_violation
+JWT_SECRET=your_secret_key
+PORT=5000
+
+🌐 Frontend Setup
+cd frontend
+npm install
+npm start
+
+
+Frontend runs at: http://localhost:3000
+
+🧪 Testing Strategy
+
+CCTV footage testing under multiple conditions
+
+OCR accuracy comparison before/after preprocessing
+
+Accident severity classification validation
+
+Alert delivery and escalation testing
+
+⚠️ Known Limitations
+
+Performance depends on CCTV resolution
+
+Extreme weather may reduce OCR accuracy
+
+High computational resources required for real-time processing
+
+📈 Future Enhancements
+
+Automated fine generation
+
+Authority analytics dashboard
+
+Real-time WebSocket updates
+
+Mobile application integration
+
+Advanced tamper detection
+
+📄 License
+
+This project is part of a Year 4 Research Project.
+
+👥 Contributors
+
+Wathsalavi K H S – IT22305596
+
+Pushpamal K P N – IT22561916
+
+Rashmi B G R – IT22052360
+
+Shehara I.G.D.S – IT22338334
+
+Development Team
 
 © 2024 City Traffic Department. All rights reserved.
