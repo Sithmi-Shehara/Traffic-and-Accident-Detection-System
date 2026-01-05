@@ -1,0 +1,11 @@
+node_modules/
+.env
+backend/.env
+frontend/.env
+dist/
+build/
+.DS_Store
+
+# Ignore number plate & violation UI
+frontend/src/components/NumberPlatePage.js
+frontend/src/components/ViolationsPage.js
