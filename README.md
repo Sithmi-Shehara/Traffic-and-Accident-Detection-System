@@ -59,9 +59,9 @@ Automated alerts via SMS, WhatsApp, Email, and Voice
 
 Escalation mechanisms and offline SMS fallback
 
-🌐 4. Citizen Appeal Management System (Frontend)
+🌐 4. Citizen Appeal Management System 
 
-Frontend Web Application – Developed by Shehara I.G.D.S
+Fullstack Web Application – Developed by Shehara I.G.D.S
 
 A professional React-based web frontend that allows citizens to submit and track traffic violation appeals and enables administrators to review, approve, or reject appeals transparently.
 
@@ -141,7 +141,11 @@ npm install
 npm start
 
 
-Frontend runs at: http://localhost:3000
+User Dashboard runs at: http://localhost:3000
+Frontend run by:- npm start
+Backend run by:- npm run dev
+Admin Dashboard runs at: http://localhost:3000/Login
+Run by:- npm run create-admin
 
 🧪 Testing Strategy
 
@@ -187,6 +191,6 @@ Rashmi B G R – IT22052360
 
 Shehara I.G.D.S – IT22338334
 
-Development Team
+(Development Team)
 
 © 2024 City Traffic Department. All rights reserved.
