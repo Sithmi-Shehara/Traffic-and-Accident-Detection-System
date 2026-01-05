@@ -68,6 +68,8 @@ const AccidentsPage = () => {
     navigate('/dashboard');
   };
 
+  
+
   const getSeverityColor = (severity) => {
     switch (severity.toLowerCase()) {
       case 'high': return 'error';
