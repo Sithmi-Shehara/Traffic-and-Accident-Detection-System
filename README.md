@@ -114,25 +114,6 @@ Professional blue color scheme
 
 Intuitive navigation and user-friendly forms
 
-📁 Frontend Project Structure
-src/
-├── components/
-│   ├── Header.js
-│   ├── Footer.js
-├── pages/
-│   ├── LandingPage.js
-│   ├── LoginPage.js
-│   ├── RegisterPage.js
-│   ├── CitizenDashboard.js
-│   ├── SubmitAppeal.js
-│   ├── AppealStatus.js
-│   ├── ViolationDetails.js
-│   ├── AdminDashboard.js
-│   └── AppealReview.js
-├── App.js
-├── index.js
-└── index.css
-
 🚀 Installation & Setup
 📋 Prerequisites
 
