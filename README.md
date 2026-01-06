@@ -9,27 +9,27 @@ This system enables **citizens to submit and track traffic violation appeals** w
 ## ✨ Features
 
 ### 👤 Citizen Features
-- 🏠 **Landing Page** – Informative homepage with *How It Works* section  
-- 📝 **User Registration** – Complete registration form with validation  
-- 🔐 **User Login** – Secure login interface  
-- 📊 **Citizen Dashboard** – View appeal statistics and recent appeals  
-- 📤 **Submit Appeal** – Submit new appeals with evidence upload  
-- 🔄 **Appeal Status Tracking** – Step-by-step appeal progress visualization  
-- 📄 **Violation Details** – View detailed traffic violation information  
+-  **Landing Page** – Informative homepage with *How It Works* section  
+-  **User Registration** – Complete registration form with validation  
+-  **User Login** – Secure login interface  
+-  **Citizen Dashboard** – View appeal statistics and recent appeals  
+-  **Submit Appeal** – Submit new appeals with evidence upload  
+-  **Appeal Status Tracking** – Step-by-step appeal progress visualization  
+-  **Violation Details** – View detailed traffic violation information  
 
 ---
 
 ### 🛡️ Admin Features
-- 📈 **Admin Dashboard** – Overview of all appeals with statistics & charts  
-- 🧠 **Appeal Review** – Review appeals with ML confidence scores and make decisions  
+-  **Admin Dashboard** – Overview of all appeals with statistics & charts  
+-  **Appeal Review** – Review appeals with ML confidence scores and make decisions  
 
 ---
 
 ## 🛠️ Technology Stack
-- ⚛️ **React 18.2.0** – Frontend framework  
-- 🔀 **React Router DOM 6.20.0** – Routing & navigation  
-- 🎨 **CSS3** – Custom styling with professional blue theme  
-- 🔤 **Public Sans Font** – Clean & professional typography  
+-  **React 18.2.0** – Frontend framework  
+-  **React Router DOM 6.20.0** – Routing & navigation  
+-  **CSS3** – Custom styling with professional blue theme  
+-  **Public Sans Font** – Clean & professional typography  
 
 ---
 
