@@ -564,7 +564,7 @@ def webcam_frame():
 
     saved_count = 0
 
-    # Crash
+    # Crash 
     try:
         r = crash_model(frame, verbose=False)[0]
         names = [crash_model.names[int(c)] for c in r.boxes.cls.tolist()] if r.boxes is not None else []
