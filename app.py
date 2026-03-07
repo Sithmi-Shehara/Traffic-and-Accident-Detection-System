@@ -644,7 +644,7 @@ def download_file(filename):
     return send_from_directory(OUTPUT_FOLDER, filename)
 
 
-@app.route("/")
+@app.route("/") 
 def home():
     return jsonify({"status": "Traffic Violation API Running"})
 
