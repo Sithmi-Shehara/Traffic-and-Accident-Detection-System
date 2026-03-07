@@ -607,7 +607,7 @@ def webcam_frame():
     except Exception as e:
         out["seatbelt"]["error"] = str(e)
 
-    # Helmet
+    # Helmet 
     try:
         r = helmet_model(frame, verbose=False)[0]
         names = [helmet_model.names[int(c)] for c in r.boxes.cls.tolist()] if r.boxes is not None else []
