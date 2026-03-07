@@ -625,7 +625,7 @@ def webcam_frame():
     except Exception as e:
         out["helmet"]["error"] = str(e)
 
-    # Traffic light state (single frame)
+    # Traffic light state  (single frame)
     try:
         out["traffic_light"]["state"] = detect_traffic_light(frame)
     except Exception as e:
