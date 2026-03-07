@@ -34,7 +34,7 @@ FRAME_SKIP = int(os.getenv("FRAME_SKIP", "10"))
 MAX_IMAGES = int(os.getenv("MAX_IMAGES", "3"))
 STOP_AFTER_FIRST_PLATE = os.getenv("STOP_AFTER_FIRST_PLATE", "false").lower() == "true"
 
-# Traffic violation tuning (red-light crossing)
+# Traffic violation tuning (red-light crossing) 
 TV_FRAME_SKIP = int(os.getenv("TV_FRAME_SKIP", "2"))
 STOP_BAND_TOP_RATIO = float(os.getenv("STOP_BAND_TOP_RATIO", "0.50"))
 STOP_BAND_BOTTOM_RATIO = float(os.getenv("STOP_BAND_BOTTOM_RATIO", "0.60"))
