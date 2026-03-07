@@ -310,7 +310,7 @@ def process_traffic_violation_video(cap, max_images=MAX_IMAGES):
     return saved_images, sorted(detected_plates)
 
 
-# ---------------- WEBCAM HELPERS (NEW) ----------------
+# ---------------- WEBCAM HELPERS (NEW)  ----------------
 _webcam_last_saved_at = {
     "crash": 0.0,
     "seatbelt": 0.0,
