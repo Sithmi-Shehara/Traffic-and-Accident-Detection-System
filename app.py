@@ -541,7 +541,7 @@ def webcam_frame():
     # Optional client control: { "save": true/false }
     save_requested = bool(data.get("save", True))
 
-    # Strip optional prefix: data:image/jpeg;base64,...
+     # Strip optional prefix: data:image/jpeg;base64,...
     if "," in frame_b64:
         frame_b64 = frame_b64.split(",", 1)[1]
 
