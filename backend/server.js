@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const app = express();
 
-// CORS Configuration - Allow requests from React frontend
+// CORS Configuration - Allow requests from React frontend 
 const corsOptions = {
   origin: ['http://localhost:3000', 'http://127.0.0.1:3000'], 
   credentials: true,
