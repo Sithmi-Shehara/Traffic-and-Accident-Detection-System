@@ -26,7 +26,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Violations API
+// Violations API 
 app.use('/api/violations', require('./routes/violations'));
 
 const PORT = process.env.PORT || 5001;
