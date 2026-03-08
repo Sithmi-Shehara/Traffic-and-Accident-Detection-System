@@ -109,7 +109,7 @@ router.get('/summary', async (req, res) => {
   }
 });
 
-// PATCH /api/violations/:id/resolve
+// PATCH /api/violations/:id/resolve 
 router.patch('/:id/resolve', async (req, res) => {
   try {
     const pool = getPool();
