@@ -1,17 +1,34 @@
-const mongoose = require('mongoose');
+const mysql = require('mysql2/promise');
 
-const connectDB = async () => {
+let pool;
+
+const initDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/traffic_violation', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+    pool = mysql.createPool({
+      host: process.env.MYSQL_HOST || 'localhost',
+      user: process.env.MYSQL_USER || 'root',
+      password: process.env.MYSQL_PASSWORD || '',
+      database: process.env.MYSQL_DATABASE || 'traffic_violation',
+      port: Number(process.env.MYSQL_PORT || 3306),
+      waitForConnections: true,
+      connectionLimit: Number(process.env.MYSQL_CONNECTION_LIMIT || 10),
+      queueLimit: 0,
     });
-    //message displuyed
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+
+    await pool.query('SELECT 1');
+
+    console.log('MySQL Connected');
   } catch (error) {
     console.error('Database connection error:', error.message);
     process.exit(1);
   }
 };
 
-module.exports = connectDB;
+const getPool = () => {
+  if (!pool) {
+    throw new Error('Database not initialized. Call initDB() first.');
+  }
+  return pool;
+};
+
+module.exports = { initDB, getPool };

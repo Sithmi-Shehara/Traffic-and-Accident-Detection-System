@@ -34,7 +34,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-//  Add Sample data - in real app this would come from API
+// Sample data - in real app this would come from API
 const alertsData = [
   {
     id: "TV-2024-001",
@@ -134,17 +134,17 @@ const AlertsPage = () => {
   };
 
   const handleRetryOwnerSMS = () => {
-    // In real app,this would call API to retry SMS
+    // In real app, this would call API to retry SMS
     alert('Retrying SMS to owner...');
   };
 
   const handleSendAuthorityAlert = () => {
-    // In real app,this would call API to send authority alert
+    // In real app, this would call API to send authority alert
     alert('Sending alert to authority...');
   };
 
   const handleViewEvidence = () => {
-    // In real app,this would open evidence viewer
+    // In real app, this would open evidence viewer
     alert('Opening evidence viewer...');
   };
 
@@ -178,14 +178,14 @@ const AlertsPage = () => {
         </Button>
         
         <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
-          🚨 Violation Alerts
+          Violation Alerts
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Monitor and manage violation notifications and alerts
         </Typography>
       </Box>
 
-      {/* Alert Table */}
+      {/* Alerts Table */}
       <Card sx={{ borderRadius: 3 }}>
         <CardContent sx={{ p: 0 }}>
           <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
@@ -260,7 +260,7 @@ const AlertsPage = () => {
         </CardContent>
       </Card>
 
-      {/* Violation Detail Modal */}
+      {/* Violation Details Modal */}
       <Dialog 
         open={open} 
         onClose={handleClose}
@@ -297,7 +297,7 @@ const AlertsPage = () => {
                 </Alert>
               </Grid>
 
-              {/* Violation Detail */}
+              {/* Violation Details */}
               <Grid item xs={12} md={6}>
                 <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
                   <Typography variant="h6" gutterBottom color="primary">
@@ -329,7 +329,7 @@ const AlertsPage = () => {
                 </Paper>
               </Grid>
 
-              {/* Status Information  */}
+              {/* Status Information */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
                   <Typography variant="h6" gutterBottom color="primary">

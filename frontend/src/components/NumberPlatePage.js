@@ -51,7 +51,7 @@ const NumberPlatePage = () => {
     setAnalyzing(true);
     setUploading(true);
     
-    // Simulate upload & analysis process
+    // Simulate upload and analysis process
     setTimeout(() => {
       setUploading(false);
     }, 2000);
@@ -82,7 +82,7 @@ const NumberPlatePage = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Header of the page */}
+      {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Button
           startIcon={<ArrowBack />}
@@ -101,7 +101,7 @@ const NumberPlatePage = () => {
       </Box>
 
       <Grid container spacing={4}>
-        {/*  Add Upload Section */}
+        {/* Upload Section */}
         <Grid item xs={12} md={6}>
           <Card sx={{ borderRadius: 3, height: '100%' }}>
             <CardContent sx={{ p: 4 }}>
@@ -172,7 +172,7 @@ const NumberPlatePage = () => {
           </Card>
         </Grid>
 
-        {/* Results  Section */}
+        {/* Results Section */}
         <Grid item xs={12} md={6}>
           <Card sx={{ borderRadius: 3, height: '100%' }}>
             <CardContent sx={{ p: 4 }}>
