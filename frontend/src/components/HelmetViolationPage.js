@@ -41,6 +41,7 @@ const HelmetViolationPage = () => {
       alert('Please select a valid video file');
     }
   };
+  
 
   const handleAnalyze = async () => {
     if (!selectedFile) return;
