@@ -20,7 +20,7 @@ const initDB = async () => {
     console.log('MySQL Connected');
   } catch (error) {
     console.error('Database connection error:', error.message);
-    process.exit(1);
+    process.exit(1);   // Exit the application if database connection fails
   }
 };
 
