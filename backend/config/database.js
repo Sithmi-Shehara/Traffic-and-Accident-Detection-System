@@ -1,7 +1,7 @@
 const mysql = require('mysql2/promise');
 
 let pool;
-
+ // Create a connection pool with configuration from environment variables or defaults
 const initDB = async () => {
   try {
     pool = mysql.createPool({
