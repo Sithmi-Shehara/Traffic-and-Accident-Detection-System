@@ -56,7 +56,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/violations/summary
+// GET /api/violations/summary 
 router.get('/summary', async (req, res) => {
   try {
     const pool = getPool();
