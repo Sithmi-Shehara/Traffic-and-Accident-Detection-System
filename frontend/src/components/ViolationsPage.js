@@ -32,6 +32,7 @@ const ViolationsPage = () => {
 
   const detectionBaseUrl = process.env.REACT_APP_DETECTION_API_URL || 'http://localhost:5000';
 
+  
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file && file.type.startsWith('video/')) {
