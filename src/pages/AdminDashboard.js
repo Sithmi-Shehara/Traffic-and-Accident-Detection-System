@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Footer from '../components/Footer';
 import API_BASE_URL from '../config/api';
 import { getToken } from '../utils/auth';
@@ -7,6 +7,7 @@ import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState({
@@ -27,6 +28,13 @@ const AdminDashboard = () => {
     fetchStatistics();
     fetchNotifications();
   }, []);
+
+  // Refresh notifications when returning to dashboard (e.g., after reviewing appeal)
+  useEffect(() => {
+    if (location.pathname === '/admin/dashboard') {
+      fetchNotifications();
+    }
+  }, [location.pathname]);
 
   // Fetch appeals based on filter
   useEffect(() => {
@@ -204,7 +212,7 @@ const AdminDashboard = () => {
             <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold' }}>
               Recent Notifications
             </h3>
-            {notifications.slice(0, 3).map((notif) => (
+                {notifications.slice(0, 3).map((notif) => (
               <div key={notif._id} style={{
                 padding: '8px',
                 marginBottom: '8px',
@@ -215,7 +223,26 @@ const AdminDashboard = () => {
                 <strong>{notif.title}:</strong> {notif.message}
                 {notif.appealId && (
                   <button
-                    onClick={() => navigate(`/admin/appeal-review/${notif.appealId._id}`)}
+                    onClick={async () => {
+                      // Mark notification as read
+                      try {
+                        const token = getToken();
+                        if (token && notif._id) {
+                          await fetch(`${API_BASE_URL}/notifications/${notif._id}/read`, {
+                            method: 'PUT',
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                            },
+                          });
+                          // Refresh notifications to remove the read one
+                          fetchNotifications();
+                        }
+                      } catch (error) {
+                        console.error('Error marking notification as read:', error);
+                      }
+                      // Navigate to review page
+                      navigate(`/admin/appeal-review/${notif.appealId._id || notif.appealId}`);
+                    }}
                     style={{
                       marginLeft: '10px',
                       padding: '4px 8px',
@@ -248,23 +275,83 @@ const AdminDashboard = () => {
         )}
 
         <div className="stats-container">
-          <div className="stat-card admin-stat">
+          <div 
+            className="stat-card admin-stat" 
+            style={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}
+            onClick={() => setFilter('all')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '';
+            }}
+          >
             <h3 className="stat-label">Total Appeals</h3>
             <p className="stat-value">{stats.total}</p>
           </div>
-          <div className="stat-card admin-stat">
+          <div 
+            className="stat-card admin-stat" 
+            style={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}
+            onClick={() => setFilter('pending')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '';
+            }}
+          >
             <h3 className="stat-label">Pending</h3>
             <p className="stat-value">{stats.pending}</p>
           </div>
-          <div className="stat-card admin-stat">
+          <div 
+            className="stat-card admin-stat" 
+            style={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}
+            onClick={() => setFilter('under-review')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '';
+            }}
+          >
             <h3 className="stat-label">Under Review</h3>
             <p className="stat-value">{stats.underReview}</p>
           </div>
-          <div className="stat-card admin-stat">
+          <div 
+            className="stat-card admin-stat" 
+            style={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}
+            onClick={() => setFilter('approved')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '';
+            }}
+          >
             <h3 className="stat-label">Approved</h3>
             <p className="stat-value">{stats.approved}</p>
           </div>
-          <div className="stat-card admin-stat">
+          <div 
+            className="stat-card admin-stat" 
+            style={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}
+            onClick={() => setFilter('rejected')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '';
+            }}
+          >
             <h3 className="stat-label">Rejected</h3>
             <p className="stat-value">{stats.rejected}</p>
           </div>
@@ -276,9 +363,6 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        <div className="section-header">
-          <h2 className="section-title">Filter Appeals</h2>
-        </div>
 
         <div className="filter-buttons" style={{ 
           display: 'flex', 

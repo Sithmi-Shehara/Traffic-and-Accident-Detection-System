@@ -4,10 +4,12 @@
   "description": "Citizen Appeal System for Traffic and Accident Detection System",
   "private": true,
   "dependencies": {
+    "ipaddr.js": "^2.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",
-    "react-scripts": "5.0.1"
+    "react-scripts": "^5.0.1",
+    "webpack-dev-server": "^5.2.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -31,10 +33,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "binary-extensions": "^3.1.0"
   }
 }
-
-
-
-
-

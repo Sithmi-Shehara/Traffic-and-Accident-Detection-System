@@ -18,6 +18,7 @@ const AppealStatusTracking = () => {
     approved: 0,
     rejected: 0,
   });
+  const [allAppeals, setAllAppeals] = useState([]); // Store all appeals for stats
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -36,35 +37,51 @@ const AppealStatusTracking = () => {
         return;
       }
 
-      const statusParam = filter !== 'all' ? `&status=${filter}` : '';
-      const response = await fetch(`${API_BASE_URL}/appeals?page=1&limit=100${statusParam}`, {
+      // Always fetch ALL appeals first to calculate accurate stats
+      const allResponse = await fetch(`${API_BASE_URL}/appeals?page=1&limit=1000`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const data = await response.json();
+      const allData = await allResponse.json();
 
-      if (data.success) {
-        const appealsList = data.data.appeals || [];
-        setAppeals(appealsList);
+      if (allData.success) {
+        const allAppealsList = allData.data.appeals || [];
+        setAllAppeals(allAppealsList);
         
-        // Calculate stats
-        const total = data.total || appealsList.length;
-        const pending = appealsList.filter(a => a.status === 'pending').length;
-        const underReview = appealsList.filter(a => a.status === 'under-review').length;
-        const approved = appealsList.filter(a => a.status === 'approved').length;
-        const rejected = appealsList.filter(a => a.status === 'rejected').length;
+        // Calculate stats from ALL appeals
+        const total = allData.total || allAppealsList.length;
+        
+        const allStatuses = {
+          pending: 0,
+          'under-review': 0,
+          approved: 0,
+          rejected: 0
+        };
+        
+        allAppealsList.forEach(appeal => {
+          if (appeal.status && allStatuses.hasOwnProperty(appeal.status)) {
+            allStatuses[appeal.status]++;
+          }
+        });
         
         setStats({
           total,
-          pending,
-          underReview,
-          approved,
-          rejected,
+          pending: allStatuses.pending,
+          underReview: allStatuses['under-review'],
+          approved: allStatuses.approved,
+          rejected: allStatuses.rejected,
         });
+
+        // Filter appeals for display based on current filter
+        const filteredList = filter === 'all'
+          ? allAppealsList
+          : allAppealsList.filter(appeal => appeal.status === filter);
+        
+        setAppeals(filteredList);
       } else {
-        setError(data.message || 'Failed to fetch appeals');
+        setError(allData.message || 'Failed to fetch appeals');
       }
     } catch (error) {
       console.error('Appeals fetch error:', error);
@@ -161,9 +178,8 @@ const AppealStatusTracking = () => {
       fine: 'Rs. 1,500'
     }
   ];*/
-  const filteredAppeals = filter === 'all'
-  ? appeals
-  : appeals.filter(appeal => appeal.status === filter);
+  // Appeals are already filtered in fetchAppeals, so use them directly
+  const filteredAppeals = appeals;
 
 
   /*const filteredAppeals = filter === 'all' 

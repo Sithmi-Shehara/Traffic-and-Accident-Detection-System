@@ -72,6 +72,7 @@ const SubmitAppeal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form submitted', formData);
     setError('');
     setErrors({});
     setLoading(true);
@@ -102,10 +103,30 @@ const SubmitAppeal = () => {
     if (!formData.declaration) {
       validationErrors.declaration = 'Please confirm the legal declaration';
     }
+    
+    if (!formData.violationDate) {
+      validationErrors.violationDate = 'Violation date is required';
+    } else {
+      // Check if violation date is within the last 2 weeks (appeal deadline)
+      const violationDate = new Date(formData.violationDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const twoWeeksAgo = new Date(today);
+      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+      
+      if (violationDate > today) {
+        validationErrors.violationDate = 'Violation date cannot be in the future';
+      } else if (violationDate < twoWeeksAgo) {
+        validationErrors.violationDate = 'Appeal submission deadline has passed. Violation date must be within the last 2 weeks.';
+      }
+    }
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      setError('Please fix the errors below before submitting.');
       setLoading(false);
+      // Scroll to top to show errors
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -129,10 +150,12 @@ const SubmitAppeal = () => {
       formDataToSend.append('description', formData.detailedExplanation.trim());
       
       // Add violation date (required for deadline calculation)
-      if (violationData?.violationDate) {
+      if (formData.violationDate) {
+        formDataToSend.append('violationDate', new Date(formData.violationDate).toISOString());
+      } else if (violationData?.violationDate) {
         formDataToSend.append('violationDate', violationData.violationDate.toISOString());
       } else {
-        // Default to current date if not available (should come from violation system)
+        // Default to current date if not available
         formDataToSend.append('violationDate', new Date().toISOString());
       }
       
@@ -152,17 +175,51 @@ const SubmitAppeal = () => {
         body: formDataToSend,
       });
 
+      // Check if response is OK before parsing JSON
+      if (!response.ok) {
+        // Try to parse error message from response
+        let errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+          // Handle validation errors
+          if (errorData.errors) {
+            const errorFields = Object.keys(errorData.errors);
+            if (errorFields.length > 0) {
+              setErrors(errorData.errors);
+            }
+          }
+        } catch (parseError) {
+          // If response is not JSON, use status text
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        setError(errorMessage);
+        setLoading(false);
+        return;
+      }
+
       const data = await response.json();
 
+      console.log('Response received:', data);
+      
       if (data.success) {
-        // Success - redirect to dashboard
-        navigate('/dashboard');
+        // Success - redirect to appeal status page with the appeal ID
+        const appealId = data.data?.appeal?.id;
+        console.log('Appeal submitted successfully, ID:', appealId);
+        if (appealId) {
+          navigate(`/appeal-status/${appealId}`);
+        } else {
+          // Fallback to dashboard if appeal ID is not available
+          console.log('No appeal ID, navigating to dashboard');
+          navigate('/dashboard');
+        }
       } else {
+        console.log('Appeal submission failed:', data.message);
         setError(data.message || 'Failed to submit appeal. Please try again.');
       }
     } catch (error) {
       console.error('Appeal submission error:', error);
-      setError('Network error. Please check if backend is running.');
+      setError(`Network error: ${error.message}. Please check if backend is running and try again.`);
     } finally {
       setLoading(false);
     }
@@ -194,13 +251,18 @@ const SubmitAppeal = () => {
           <form onSubmit={handleSubmit} className="appeal-form">
             {error && (
               <div className="error-message" style={{ 
-                color: 'red', 
-                padding: '10px', 
-                marginBottom: '15px',
-                backgroundColor: '#ffe6e6',
-                borderRadius: '5px'
+                color: '#c62828', 
+                padding: '15px', 
+                marginBottom: '20px',
+                backgroundColor: '#ffebee',
+                borderRadius: '8px',
+                border: '1px solid #ef5350',
+                fontSize: '16px',
+                fontWeight: '500',
+                width: '100%',
+                textAlign: 'center'
               }}>
-                {error}
+                ⚠️ {error}
               </div>
             )}
 
@@ -214,15 +276,45 @@ const SubmitAppeal = () => {
                 name="violationId"
                 value={formData.violationId}
                 onChange={handleChange}
-                className="form-input"
-                placeholder="Violation ID (auto-filled from violation)"
+                className={`form-input ${errors.violationId ? 'input-error' : ''}`}
+                placeholder="Enter Violation ID (e.g., VIO-2024-001)"
                 required
-                readOnly
-                style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
               />
-              {!formData.violationId && (
+              {errors.violationId && (
+                <span className="error-message-field">{errors.violationId}</span>
+              )}
+              {!formData.violationId && !errors.violationId && (
                 <p style={{ fontSize: '14px', color: '#666', marginTop: '4px' }}>
-                  Please navigate from a violation details page to auto-fill this field.
+                  Enter your Violation ID. If you came from a violation details page, this should be auto-filled.
+                </p>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="violationDate" className="form-label">
+                Violation Date <span style={{ color: 'red' }}>*</span>
+              </label>
+              <input
+                type="date"
+                id="violationDate"
+                name="violationDate"
+                value={formData.violationDate}
+                onChange={handleChange}
+                className={`form-input ${errors.violationDate ? 'input-error' : ''}`}
+                required
+                max={new Date().toISOString().split('T')[0]}
+                min={(() => {
+                  const twoWeeksAgo = new Date();
+                  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+                  return twoWeeksAgo.toISOString().split('T')[0];
+                })()}
+              />
+              {errors.violationDate && (
+                <span className="error-message-field">{errors.violationDate}</span>
+              )}
+              {!formData.violationDate && !errors.violationDate && (
+                <p style={{ fontSize: '14px', color: '#666', marginTop: '4px' }}>
+                  Select the date when the violation occurred.
                 </p>
               )}
             </div>
@@ -319,7 +411,7 @@ const SubmitAppeal = () => {
                   name="evidence"
                   onChange={handleChange}
                   className="file-input"
-                  accept="image/*,video/*,.pdf,.doc,.docx"
+                  accept="image/*,.pdf"
                   required
                 />
               </div>
@@ -380,8 +472,19 @@ const SubmitAppeal = () => {
               type="submit" 
               className="submit-button"
               disabled={loading}
+              onClick={(e) => {
+                console.log('Submit button clicked, loading:', loading);
+                // Form onSubmit will handle the actual submission
+              }}
             >
-              {loading ? 'Submitting...' : 'Submit Appeal'}
+              {loading ? (
+                <>
+                  <span style={{ marginRight: '8px' }}>⏳</span>
+                  Submitting...
+                </>
+              ) : (
+                'Submit Appeal'
+              )}
             </button>
           </form>
         </div>

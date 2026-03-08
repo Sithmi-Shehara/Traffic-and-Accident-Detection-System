@@ -379,7 +379,11 @@ const AppealStatus = () => {
                 <span className="summary-value">{appealData.violationDetails.deadline}</span>
               </div>
             </div>
-            <Link to={`/violation-details/${appealData.violationId}`} className="view-violation-link">
+            <Link 
+              to={`/violation-details/${appealData.violationId}`}
+              state={{ appealId: appealData.appealId }}
+              className="view-violation-link"
+            >
               View Full Violation Details →
             </Link>
           </div>
@@ -474,6 +478,51 @@ const AppealStatus = () => {
                   )}
                 </div>
               </div>
+              
+              {/* Next Steps for Rejected Appeals */}
+              {appealData.status === 'rejected' && (
+                <div style={{ 
+                  marginTop: '20px', 
+                  padding: '20px',
+                  backgroundColor: '#FFF3E0',
+                  borderRadius: '8px',
+                  border: '1px solid #FF9800',
+                }}>
+                  <h4 style={{ 
+                    color: '#E65100', 
+                    fontSize: '18px', 
+                    fontWeight: 'bold',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <span>📋</span> Next Steps
+                  </h4>
+                  <ul style={{ 
+                    color: '#E65100', 
+                    fontSize: '14px',
+                    lineHeight: '1.8',
+                    margin: 0,
+                    paddingLeft: '20px'
+                  }}>
+                    <li>Pay the violation fine within the specified deadline to avoid additional penalties</li>
+                    <li>If you believe the rejection was incorrect, you may contact the traffic department for further review</li>
+                    <li>Keep a copy of this rejection notice for your records</li>
+                    <li>For payment options and deadlines, visit the traffic department office or check your violation notice</li>
+                  </ul>
+                  <div style={{ 
+                    marginTop: '15px',
+                    padding: '12px',
+                    backgroundColor: '#FFE0B2',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    color: '#BF360C'
+                  }}>
+                    <strong>Important:</strong> Failure to pay the fine within the deadline may result in additional penalties, vehicle registration suspension, or legal action.
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

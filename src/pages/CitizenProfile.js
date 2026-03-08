@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import API_BASE_URL from '../config/api';
-import { getToken, isAuthenticated } from '../utils/auth';
+import { getToken, isAuthenticated, removeToken } from '../utils/auth';
 import './CitizenProfile.css';
 
 const CitizenProfile = () => {
@@ -26,24 +26,44 @@ const CitizenProfile = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
+      setError('');
       const token = getToken();
       if (!token) {
         navigate('/login');
         return;
       }
 
+      // Always fetch fresh user data, no caching
       const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        cache: 'no-store', // Prevent caching
       });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          navigate('/login');
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && data.data && data.data.user) {
         setUser(data.data.user);
         if (data.data.user.profilePhoto) {
-          setPhotoPreview(`${API_BASE_URL.replace('/api', '')}${data.data.user.profilePhoto}`);
+          // Construct the correct URL for the profile photo
+          // Backend stores relative path like 'profile-photos/profile-xxx.jpg'
+          // Static files are served at /uploads, so URL should be /uploads/profile-photos/profile-xxx.jpg
+          const photoPath = data.data.user.profilePhoto;
+          const baseUrl = API_BASE_URL.replace('/api', '');
+          // Ensure the path starts with /uploads
+          const photoUrl = photoPath.startsWith('/uploads') 
+            ? `${baseUrl}${photoPath}` 
+            : `${baseUrl}/uploads/${photoPath}`;
+          setPhotoPreview(photoUrl);
         }
       } else {
         setError(data.message || 'Failed to fetch profile');
@@ -111,12 +131,38 @@ const CitizenProfile = () => {
         body: formData,
       });
 
+      // Check response status before parsing JSON
+      if (!response.ok) {
+        let errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (parseError) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        setError(errorMessage);
+        setUpdating(false);
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {
         setSuccess('Profile photo updated successfully');
+        setError(''); // Clear any previous errors
         setProfilePhoto(null);
-        fetchUserData(); // Refresh user data
+        // Update photo preview immediately with the new photo path
+        if (data.data?.profilePhoto) {
+          const photoPath = data.data.profilePhoto;
+          const baseUrl = API_BASE_URL.replace('/api', '');
+          // Backend returns relative path like 'profile-photos/profile-xxx.jpg'
+          // Static files are served at /uploads, so URL should be /uploads/profile-photos/profile-xxx.jpg
+          const photoUrl = photoPath.startsWith('/uploads') 
+            ? `${baseUrl}${photoPath}` 
+            : `${baseUrl}/uploads/${photoPath}`;
+          setPhotoPreview(photoUrl);
+        }
+        fetchUserData(); // Refresh user data to get updated info
       } else {
         setError(data.message || 'Failed to update profile photo');
       }
@@ -126,6 +172,11 @@ const CitizenProfile = () => {
     } finally {
       setUpdating(false);
     }
+  };
+
+  const handleLogout = () => {
+    removeToken();
+    navigate('/login');
   };
 
   const formatDate = (dateString) => {
@@ -158,8 +209,34 @@ const CitizenProfile = () => {
     <div className="citizen-profile-page">
       <div className="page-content">
         <div className="profile-container">
-          <div className="profile-header">
+          <div className="profile-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1 className="profile-title">My Profile</h1>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#F44336',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'background-color 0.3s',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#d32f2f';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#F44336';
+              }}
+            >
+              <span>🚪</span>
+              Logout
+            </button>
           </div>
 
           {error && (
