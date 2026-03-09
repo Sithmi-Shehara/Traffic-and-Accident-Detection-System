@@ -10,7 +10,8 @@ import {
   Grid,
   Chip,
   Alert,
-  LinearProgress
+  LinearProgress,
+  Divider
 } from '@mui/material';
 import {
   CloudUpload,
@@ -20,6 +21,7 @@ import {
   LocalHospital
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AccidentsPage = () => {
   const navigate = useNavigate();
@@ -27,6 +29,9 @@ const AccidentsPage = () => {
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [analysisError, setAnalysisError] = useState('');
+
+  const detectionBaseUrl = process.env.REACT_APP_DETECTION_API_URL || 'http://localhost:5000';
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -43,40 +48,30 @@ const AccidentsPage = () => {
     
     setAnalyzing(true);
     setUploading(true);
-    
-    // Simulate upload and analysis process
-    setTimeout(() => {
+    setAnalysisError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('video', selectedFile);
+
+      const response = await axios.post(
+        `${detectionBaseUrl}/detect-crash`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
+      setAnalysisResult(response.data || { message: 'Request submitted' });
+    } catch (error) {
+      setAnalysisError('Failed to submit video for analysis.');
+      setAnalysisResult(null);
+    } finally {
       setUploading(false);
-    }, 2000);
-    
-    setTimeout(() => {
       setAnalyzing(false);
-      setAnalysisResult({
-        accidents: [
-          { type: 'Rear-end Collision', severity: 'High', timestamp: '00:45', location: 'Main Street' },
-          { type: 'Side Impact', severity: 'Medium', timestamp: '02:12', location: 'Elm Avenue' },
-          { type: 'Single Vehicle', severity: 'Low', timestamp: '03:28', location: 'Oak Road' }
-        ],
-        totalAccidents: 3,
-        duration: '05:30',
-        emergencyContacts: true
-      });
-    }, 4000);
+    }
   };
 
   const handleBack = () => {
     navigate('/dashboard');
-  };
-
-  
-
-  const getSeverityColor = (severity) => {
-    switch (severity.toLowerCase()) {
-      case 'high': return 'error';
-      case 'medium': return 'warning';
-      case 'low': return 'success';
-      default: return 'default';
-    }
   };
 
   return (
@@ -92,7 +87,7 @@ const AccidentsPage = () => {
         </Button>
         
         <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
-          🚨 Road Accident Detection
+          Road Accident Detection
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Upload traffic footage to detect and analyze road accidents automatically
@@ -192,53 +187,67 @@ const AccidentsPage = () => {
 
               {analysisResult ? (
                 <Box>
-                  <Alert 
-                    severity={analysisResult.emergencyContacts ? "warning" : "success"} 
-                    sx={{ mb: 3 }}
-                  >
-                    {analysisResult.emergencyContacts ? '🚨' : '✅'} 
-                    Analysis Complete! Found {analysisResult.totalAccidents} accidents
+                  <Alert severity={analysisResult.crash_detected ? 'error' : 'success'} sx={{ mb: 3 }}>
+                    {analysisResult.crash_detected ? '🚨' : '✅'} Crash Detection Result
                   </Alert>
 
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom>
-                      Detected Accidents:
-                    </Typography>
-                    {analysisResult.accidents.map((accident, index) => (
-                      <Paper key={index} sx={{ p: 2, mb: 1, bgcolor: 'grey.50' }}>
-                        <Box sx={{ mb: 1 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                            <Typography variant="body1" fontWeight="bold">
-                              {accident.type}
-                            </Typography>
-                            <Chip 
-                              label={accident.severity}
-                              color={getSeverityColor(accident.severity)}
-                              size="small"
-                            />
-                          </Box>
-                          <Typography variant="body2" color="text.secondary">
-                            📍 Location: {accident.location}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            ⏰ Timestamp: {accident.timestamp}
-                          </Typography>
-                        </Box>
-                      </Paper>
-                    ))}
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                    <Chip label={`Detected: ${analysisResult.crash_detected ? 'Yes' : 'No'}`} color={analysisResult.crash_detected ? 'error' : 'success'} />
+                    <Chip label={`Images Sent: ${analysisResult.images_sent ?? 0}`} variant="outlined" />
+                    <Chip label={`Plates: ${analysisResult.detected_plates?.length ?? 0}`} variant="outlined" />
+                    <Chip label={`Fire Check: ${analysisResult.fire_check_enabled ? 'On' : 'Off'}`} variant="outlined" />
+                    <Chip label={`Fire Images: ${analysisResult.crash_with_fire_images ?? 0}`} variant="outlined" />
                   </Box>
 
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    <Chip icon={<LocalHospital />} label="Emergency Services" variant="outlined" color="error" />
-                    <Chip label={`Duration: ${analysisResult.duration}`} variant="outlined" />
-                  </Box>
+                  <Divider sx={{ my: 2 }} />
+
+                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                    Detected Plates
+                  </Typography>
+                  {analysisResult.detected_plates?.length ? (
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                      {analysisResult.detected_plates.map((plate) => (
+                        <Chip key={plate} label={plate} />
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      No plates detected.
+                    </Typography>
+                  )}
+
+                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                    Saved Images
+                  </Typography>
+                  {analysisResult.saved_images?.length ? (
+                    <Grid container spacing={2}>
+                      {analysisResult.saved_images.map((url) => (
+                        <Grid item xs={12} sm={6} key={url}>
+                          <Paper sx={{ p: 1 }}>
+                            <img src={url} alt="crash" style={{ width: '100%', borderRadius: 6 }} />
+                            <Button size="small" href={url} target="_blank" rel="noreferrer" sx={{ mt: 1 }}>
+                              Open
+                            </Button>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No images saved.
+                    </Typography>
+                  )}
                 </Box>
               ) : (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
                   <Warning sx={{ fontSize: 64, color: 'grey.300', mb: 2 }} />
-                  <Typography variant="body1" color="text.secondary">
-                    Upload and analyze a video to see accident detection results here
-                  </Typography>
+                  {analysisError ? (
+                    <Alert severity="error">{analysisError}</Alert>
+                  ) : (
+                    <Typography variant="body1" color="text.secondary">
+                      Upload and analyze a video to see accident detection results here
+                    </Typography>
+                  )}
                 </Box>
               )}
             </CardContent>
