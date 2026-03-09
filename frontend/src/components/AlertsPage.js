@@ -178,7 +178,7 @@ const AlertsPage = () => {
         </Button>
         
         <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
-          🚨 Violation Alerts
+          Violation Alerts
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Monitor and manage violation notifications and alerts
